@@ -5,230 +5,1074 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#081018" />
   <meta name="description" content="Jarvis Web Voice Assistant Ultimate PWA" />
-  <title>Jarvis — Web Voice Assistant (Phase 2)</title>
-  <link rel="manifest" href="manifest.json">
+  <title>Jarvis — Web Voice Assistant ULTRA</title>
+  <link rel="manifest" href="manifest.json" />
 
   <style>
     :root{
-      --bg:#081018;
-      --bg2:#041018;
-      --card:#09121a;
-      --card2:#0d1720;
-      --muted:#9aa6b3;
-      --accent:#ff6a00;
-      --accent2:#22c55e;
+      --bg:#060d16;
+      --bg2:#091423;
+      --panel:#0b1624;
+      --panel2:#0e1c2d;
+      --card:#101c2b;
+      --glass:rgba(255,255,255,.04);
+      --glass2:rgba(255,255,255,.025);
+      --line:rgba(255,255,255,.08);
+      --muted:#90a4b7;
+      --text:#eaf3ff;
+      --accent:#ff7a18;
+      --accent2:#19d36b;
+      --accent3:#2ed3ff;
+      --danger:#ff6b57;
       --success:#22c55e;
-      --danger:#ff6a00;
-      --glass:rgba(255,255,255,.03);
-      --glass2:rgba(255,255,255,.02);
-      --line:rgba(255,255,255,.06);
-      --text:#e6eef8;
-      --shadow:0 18px 44px rgba(0,0,0,.38);
-      --radius:16px;
+      --shadow:0 20px 50px rgba(0,0,0,.35);
+      --radius:18px;
+      --radius2:24px;
     }
-    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    html,body{height:100%;margin:0}
+
+    *{
+      box-sizing:border-box;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    html,body{
+      height:100%;
+      margin:0;
+    }
+
     body{
       font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
       background:
-        radial-gradient(circle at top right, rgba(255,106,0,.08), transparent 30%),
-        radial-gradient(circle at bottom left, rgba(34,197,94,.08), transparent 30%),
-        linear-gradient(180deg,var(--bg2) 0%,var(--bg) 100%);
+        radial-gradient(circle at top right, rgba(255,122,24,.10), transparent 26%),
+        radial-gradient(circle at bottom left, rgba(25,211,107,.09), transparent 24%),
+        radial-gradient(circle at center, rgba(46,211,255,.05), transparent 34%),
+        linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);
       color:var(--text);
+      overflow-x:hidden;
       transition:background .25s ease,color .25s ease;
     }
-    .wrap{max-width:1140px;margin:0 auto;padding:18px}
-    header{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;margin-bottom:14px}
-    .brand{min-width:0}
-    h1{margin:0;font-size:24px;letter-spacing:.3px}
-    .subtitle{color:var(--muted);font-size:13px;margin-top:5px;line-height:1.45}
-    .top-status{margin-left:auto;text-align:right}
-    .status{
-      display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;
-      background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--muted);font-size:13px;backdrop-filter:blur(8px)
+
+    body.light-mode{
+      --bg:#edf5ff;
+      --bg2:#dbe9f7;
+      --panel:#ffffff;
+      --panel2:#f5f9fe;
+      --card:#ffffff;
+      --glass:rgba(255,255,255,.70);
+      --glass2:rgba(255,255,255,.55);
+      --line:rgba(0,0,0,.08);
+      --muted:#506477;
+      --text:#122436;
+      --shadow:0 18px 45px rgba(20,40,80,.12);
     }
-    .dot{width:8px;height:8px;border-radius:50%;background:#888}
-    .dot.live{background:var(--success);box-shadow:0 0 12px rgba(34,197,94,.6)}
-    .controls{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 0}
-    button,select,input,textarea{font:inherit}
+
+    .wrap{
+      max-width:1180px;
+      margin:0 auto;
+      padding:18px;
+      position:relative;
+      z-index:1;
+    }
+
+    .bg-grid{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+      opacity:.18;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size:28px 28px;
+      mask-image:radial-gradient(circle at center, black 40%, transparent 90%);
+    }
+
+    .hud-glow{
+      position:fixed;
+      inset:auto;
+      width:520px;
+      height:520px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(255,122,24,.14), transparent 60%);
+      filter:blur(22px);
+      top:-120px;
+      right:-120px;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .hud-glow2{
+      position:fixed;
+      width:420px;
+      height:420px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(25,211,107,.12), transparent 62%);
+      filter:blur(20px);
+      bottom:-120px;
+      left:-120px;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    header{
+      display:flex;
+      flex-wrap:wrap;
+      gap:16px;
+      align-items:flex-start;
+      margin-bottom:14px;
+    }
+
+    .hero{
+      flex:1 1 540px;
+      min-width:0;
+    }
+
+    .hero-title{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    h1{
+      margin:0;
+      font-size:28px;
+      letter-spacing:.4px;
+      line-height:1.1;
+    }
+
+    .sub{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+      max-width:760px;
+    }
+
+    .micro-badges{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .micro-badge{
+      padding:7px 10px;
+      border-radius:999px;
+      font-size:12px;
+      color:#c7d7e8;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.06);
+      backdrop-filter:blur(10px);
+    }
+
+    body.light-mode .micro-badge{
+      color:#284257;
+      background:rgba(255,255,255,.7);
+      border-color:rgba(0,0,0,.08);
+    }
+
+    .status-wrap{
+      margin-left:auto;
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:10px;
+      min-width:220px;
+    }
+
+    .status-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.05);
+      color:var(--muted);
+      font-size:13px;
+      backdrop-filter:blur(12px);
+    }
+
+    .status-dot{
+      width:9px;
+      height:9px;
+      border-radius:50%;
+      background:#7b8a9b;
+    }
+
+    .status-dot.live{
+      background:var(--success);
+      box-shadow:0 0 16px rgba(34,197,94,.6);
+    }
+
+    .hud-row{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:16px;
+      margin-top:14px;
+    }
+
+    .glass{
+      background:linear-gradient(180deg,var(--glass),var(--glass2));
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+      border-radius:var(--radius2);
+      backdrop-filter:blur(16px);
+    }
+
+    .hero-banner{
+      padding:16px;
+      overflow:hidden;
+      position:relative;
+    }
+
+    .hero-banner::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at 18% 25%, rgba(255,122,24,.16), transparent 24%),
+        radial-gradient(circle at 82% 72%, rgba(25,211,107,.14), transparent 25%);
+      pointer-events:none;
+    }
+
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:14px;
+      position:relative;
+      z-index:1;
+    }
+
+    .hero-card{
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:18px;
+      padding:14px;
+    }
+
+    .hero-card h3{
+      margin:0 0 8px;
+      font-size:16px;
+    }
+
+    .hero-card p{
+      margin:0;
+      font-size:13px;
+      line-height:1.55;
+      color:var(--muted);
+    }
+
+    .hero-stats{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .stat-box{
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.05);
+      border-radius:16px;
+      padding:12px;
+    }
+
+    .stat-num{
+      font-size:22px;
+      font-weight:800;
+    }
+
+    .stat-label{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:4px;
+    }
+
+    .controls{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:16px;
+    }
+
+    button,select,input,textarea{
+      font:inherit;
+    }
+
     button{
-      background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:12px;
-      padding:10px 12px;cursor:pointer;transition:.18s ease
+      background:var(--panel);
+      color:var(--text);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px 12px;
+      cursor:pointer;
+      transition:.18s ease;
     }
-    button:hover{transform:translateY(-1px);filter:brightness(1.04)}
-    button.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#07160d;font-weight:800}
-    button.smallbtn{padding:8px 10px;font-size:13px}
-    input[type="text"],input[type="search"],textarea,select{
-      background:transparent;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px 12px;outline:none
+
+    button:hover{
+      transform:translateY(-1px);
+      filter:brightness(1.03);
     }
-    input::placeholder,textarea::placeholder{color:#8da0b3}
-    select{background:var(--card)}
-    .panel{display:grid;grid-template-columns:minmax(0,1fr) 410px;gap:16px;margin-top:18px}
-    .card{
-      background:linear-gradient(180deg,var(--glass),var(--glass2));border:1px solid var(--line);
-      box-shadow:var(--shadow);border-radius:var(--radius);padding:14px;backdrop-filter:blur(14px)
+
+    button.primary{
+      background:linear-gradient(90deg,var(--accent),var(--accent2));
+      color:#07160d;
+      font-weight:800;
+      border:none;
     }
-    #left,#right{min-height:560px}
+
+    button.smallbtn{
+      padding:8px 10px;
+      font-size:13px;
+    }
+
+    .btn-ghost{
+      background:rgba(255,255,255,.03);
+    }
+
+    input[type="text"],select,textarea{
+      background:rgba(255,255,255,.02);
+      color:var(--text);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px 12px;
+      outline:none;
+    }
+
+    input::placeholder,textarea::placeholder{
+      color:#8ba0b3;
+    }
+
+    select{
+      background:var(--panel);
+    }
+
+    .main-layout{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 400px;
+      gap:16px;
+      margin-top:18px;
+    }
+
+    .panel{
+      min-width:0;
+      min-height:600px;
+      padding:14px;
+    }
+
+    .section-title{
+      font-size:18px;
+      margin:0 0 10px;
+      letter-spacing:.3px;
+    }
+
+    .section-sub{
+      font-size:12px;
+      line-height:1.45;
+      color:var(--muted);
+      margin-top:6px;
+    }
+
     #transcript{
-      min-height:190px;max-height:360px;overflow:auto;border-radius:12px;padding:12px;
-      background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)
+      min-height:210px;
+      max-height:380px;
+      overflow:auto;
+      background:rgba(255,255,255,.02);
+      border:1px solid rgba(255,255,255,.05);
+      border-radius:16px;
+      padding:14px;
     }
+
     #log{
-      height:280px;overflow:auto;border-radius:12px;padding:10px;background:rgba(255,255,255,.02);
-      border:1px solid rgba(255,255,255,.04);color:var(--muted);font-size:13px
+      height:290px;
+      overflow:auto;
+      background:rgba(255,255,255,.02);
+      border:1px solid rgba(255,255,255,.05);
+      border-radius:16px;
+      padding:10px;
+      color:var(--muted);
+      font-size:13px;
     }
-    .row{display:flex;gap:8px;align-items:center}
-    .row.wrapline{flex-wrap:wrap}
-    label{font-size:13px;color:var(--muted)}
-    .hint{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.45}
-    .muted{color:var(--muted)}
-    .kbd{background:#071827;padding:4px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.08);font-weight:700}
-    .command-list{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+
+    .row{
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+
+    .row.wrapline{
+      flex-wrap:wrap;
+    }
+
+    .hint{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.5;
+      margin-top:8px;
+    }
+
+    .command-list{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:8px;
+      margin-top:12px;
+    }
+
     .cmd{
-      background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.04);padding:10px;border-radius:12px;
-      color:var(--muted);font-size:13px;cursor:pointer;transition:.18s ease
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.05);
+      padding:11px 12px;
+      border-radius:14px;
+      color:var(--muted);
+      font-size:13px;
+      cursor:pointer;
+      transition:.18s ease;
     }
-    .cmd:hover{background:rgba(255,255,255,.05);transform:translateY(-1px)}
-    .utility-dock{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:18px 0 8px}
-    .util{
-      background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);color:var(--text);
-      padding:12px;border-radius:14px;text-align:center;cursor:pointer;transition:.18s ease
+
+    .cmd:hover{
+      transform:translateY(-1px);
+      background:rgba(255,255,255,.05);
     }
-    .util:hover{transform:translateY(-2px);background:rgba(255,255,255,.05)}
-    .util small{display:block;color:#94a3b8;font-size:12px;margin-top:4px}
-    .voice-meter{width:100%;height:36px;background:rgba(255,255,255,.02);border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.05)}
-    .voice-meter>div{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 100ms linear}
+
+    hr{
+      border:none;
+      border-top:1px solid rgba(255,255,255,.06);
+      margin:15px 0;
+    }
+
+    .voice-meter{
+      width:100%;
+      height:38px;
+      border-radius:12px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.02);
+    }
+
+    .voice-meter>div{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));
+      transition:width .12s linear;
+    }
+
     .mem-list{
-      max-height:210px;overflow:auto;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);
-      border-radius:12px;padding:8px;margin-top:8px
+      max-height:220px;
+      overflow:auto;
+      background:rgba(255,255,255,.02);
+      border:1px solid rgba(255,255,255,.05);
+      border-radius:16px;
+      padding:8px;
+      margin-top:8px;
     }
-    hr{border:none;border-top:1px solid rgba(255,255,255,.06);margin:14px 0}
-    .badge-line{text-align:center;color:#94a3b8;font-size:12px;margin:4px 0 12px}
-    footer{text-align:center;color:var(--muted);font-size:13px;margin:18px 0 8px}
-    .overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:9999;color:#fff}
-    #powerOverlay{background:rgba(0,0,0,.98);flex-direction:column;gap:18px}
-    #powerSpinner{width:64px;height:64px;border-radius:50%;border:6px solid rgba(255,255,255,.12);border-top-color:#fff;animation:spin 1s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    #flashlightOverlay{background:#fff;display:none}
-    #lockOverlay{background:rgba(0,0,0,.92);color:#fff;flex-direction:column;gap:12px;text-align:center}
-    #cameraOverlay{background:rgba(0,0,0,.94);color:#fff;flex-direction:column;gap:10px}
-    .overlayTopBar{
-      position:fixed;top:14px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;
-      background:rgba(255,255,255,.05);padding:8px 12px;border:1px solid rgba(255,255,255,.1);border-radius:999px;z-index:10000;backdrop-filter:blur(12px)
-    }
-    .overlayTopBar button{background:transparent;border:1px solid rgba(255,255,255,.16);color:#fff;border-radius:999px}
-    #cameraView{width:min(92vw,960px);height:min(70vh,520px);background:#000;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.08)}
-    #cameraView video{width:100%;height:100%;object-fit:cover}
-    #boomCanvas{position:fixed;inset:0;pointer-events:none;z-index:11000;display:none}
-    #facePreview img{max-width:120px;border-radius:10px;border:1px solid rgba(255,255,255,.08)}
+
     .notice{
-      font-size:12px;color:#b8c5d3;line-height:1.45;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);
-      padding:10px 12px;border-radius:12px;margin-top:10px
+      font-size:12px;
+      color:#b7c8d9;
+      line-height:1.5;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.05);
+      padding:12px;
+      border-radius:16px;
+      margin-top:10px;
     }
-    .pill{
-      display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.05);font-size:12px;color:#b8c7d8
+
+    .chip{
+      display:inline-block;
+      padding:8px 11px;
+      border-radius:999px;
+      margin:4px 6px 0 0;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.07);
+      font-size:12px;
+      color:#cfe1ef;
+      cursor:pointer;
+      transition:.18s ease;
     }
+
+    .chip:hover{
+      transform:translateY(-1px);
+    }
+
+    body.light-mode .chip{
+      color:#203040;
+      background:rgba(0,0,0,.03);
+      border-color:rgba(0,0,0,.08);
+    }
+
+    .utility-dock{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(125px,1fr));
+      gap:10px;
+      margin:18px 0 10px;
+    }
+
+    .util{
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.06);
+      color:var(--text);
+      padding:12px;
+      border-radius:16px;
+      text-align:center;
+      cursor:pointer;
+      transition:.18s ease;
+      min-height:86px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+    }
+
+    .util:hover{
+      transform:translateY(-2px);
+      background:rgba(255,255,255,.05);
+    }
+
+    .util small{
+      display:block;
+      color:#94a3b8;
+      font-size:11px;
+      margin-top:5px;
+      line-height:1.25;
+    }
+
+    .app-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .app-tile{
+      min-height:98px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.07);
+      background:rgba(255,255,255,.03);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      cursor:pointer;
+      font-size:28px;
+      transition:.18s ease;
+      user-select:none;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .app-tile::before{
+      content:"";
+      position:absolute;
+      inset:auto -20% -50% auto;
+      width:90px;
+      height:90px;
+      background:radial-gradient(circle, rgba(255,255,255,.1), transparent 65%);
+      pointer-events:none;
+    }
+
+    .app-tile span{
+      font-size:12px;
+      color:#cfe1ef;
+    }
+
+    .app-tile:hover{
+      transform:translateY(-2px);
+      background:rgba(255,255,255,.05);
+    }
+
+    body.light-mode .app-tile span{
+      color:#203040;
+    }
+
+    .overlay{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:9999;
+      color:#fff;
+    }
+
+    #powerOverlay{
+      background:rgba(0,0,0,.98);
+      flex-direction:column;
+      gap:18px;
+    }
+
+    #powerSpinner{
+      width:70px;
+      height:70px;
+      border-radius:50%;
+      border:6px solid rgba(255,255,255,.12);
+      border-top-color:#fff;
+      animation:spin 1s linear infinite;
+    }
+
+    @keyframes spin{
+      to{transform:rotate(360deg)}
+    }
+
+    #flashlightOverlay{
+      background:#fff;
+      display:none;
+    }
+
+    #lockOverlay{
+      background:rgba(0,0,0,.92);
+      color:#fff;
+      flex-direction:column;
+      gap:12px;
+      text-align:center;
+    }
+
+    #cameraOverlay{
+      background:rgba(0,0,0,.94);
+      color:#fff;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .overlayTopBar{
+      position:fixed;
+      top:14px;
+      left:50%;
+      transform:translateX(-50%);
+      display:flex;
+      gap:8px;
+      align-items:center;
+      background:rgba(255,255,255,.06);
+      padding:8px 12px;
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:999px;
+      z-index:10000;
+      backdrop-filter:blur(12px);
+    }
+
+    .overlayTopBar button{
+      background:transparent;
+      border:1px solid rgba(255,255,255,.16);
+      color:#fff;
+      border-radius:999px;
+    }
+
+    #cameraView{
+      width:min(92vw,960px);
+      height:min(70vh,520px);
+      background:#000;
+      border-radius:16px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    #cameraView video{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    #boomCanvas{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:11000;
+      display:none;
+    }
+
+    #facePreview img{
+      max-width:120px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .install-banner{
+      display:none;
+      margin-top:12px;
+      padding:12px;
+    }
+
     #jarvisOrb{
-      position:fixed;right:18px;bottom:18px;width:68px;height:68px;border-radius:50%;
-      background:radial-gradient(circle at 35% 35%, rgba(255,255,255,.7), transparent 18%),
-                 radial-gradient(circle at center, rgba(34,197,94,.28), rgba(255,106,0,.18), rgba(0,0,0,.4));
+      position:fixed;
+      right:18px;
+      bottom:18px;
+      width:72px;
+      height:72px;
+      border-radius:50%;
+      background:
+        radial-gradient(circle at 35% 35%, rgba(255,255,255,.7), transparent 18%),
+        radial-gradient(circle at center, rgba(34,197,94,.28), rgba(255,122,24,.18), rgba(0,0,0,.4));
       border:1px solid rgba(255,255,255,.12);
-      box-shadow:0 0 28px rgba(255,106,0,.25),0 0 38px rgba(34,197,94,.18),inset 0 0 18px rgba(255,255,255,.08);
-      z-index:9998;animation:orbFloat 3s ease-in-out infinite;cursor:pointer;backdrop-filter:blur(10px)
+      box-shadow:
+        0 0 28px rgba(255,122,24,.25),
+        0 0 38px rgba(34,197,94,.18),
+        inset 0 0 18px rgba(255,255,255,.08);
+      z-index:9998;
+      animation:orbFloat 3s ease-in-out infinite;
+      cursor:pointer;
+      backdrop-filter:blur(10px);
     }
+
     @keyframes orbFloat{
       0%,100%{transform:translateY(0px) scale(1)}
       50%{transform:translateY(-6px) scale(1.03)}
     }
-    body.light-mode{
-      --bg:#edf4fb;--bg2:#dce9f7;--card:#ffffff;--card2:#f4f8fd;--muted:#516272;--glass:rgba(255,255,255,.72);
-      --glass2:rgba(255,255,255,.56);--line:rgba(0,0,0,.08);--text:#112233;color:var(--text)
+
+    .boot-panel{
+      position:relative;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at center, rgba(255,122,24,.10), transparent 35%),
+        radial-gradient(circle at center, rgba(25,211,107,.08), transparent 45%),
+        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
     }
-    .chip{
-      display:inline-block;padding:8px 10px;border-radius:999px;margin:4px 6px 0 0;background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.07);font-size:12px;color:#cfe1ef;cursor:pointer
+
+    .boot-topline{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      font-size:11px;
+      letter-spacing:1.6px;
+      color:#c9d8e8;
+      opacity:.88;
     }
-    body.light-mode .chip{color:#203040;background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.08)}
-    @media (max-width:980px){.panel{grid-template-columns:1fr}#right{order:2}}
+
+    .boot-title{
+      margin-top:10px;
+      font-size:16px;
+      font-weight:800;
+      letter-spacing:1.4px;
+      color:#eef7ff;
+    }
+
+    .boot-ring-wrap{
+      position:relative;
+      width:180px;
+      height:180px;
+      margin:18px auto 14px;
+      display:grid;
+      place-items:center;
+    }
+
+    .boot-ring{
+      position:absolute;
+      border-radius:50%;
+      border:2px solid rgba(255,255,255,.08);
+      box-shadow:0 0 20px rgba(255,122,24,.08), 0 0 24px rgba(25,211,107,.06);
+    }
+
+    .boot-ring.outer{
+      width:180px;
+      height:180px;
+      border-top-color:var(--accent);
+      border-right-color:rgba(25,211,107,.8);
+      animation:spinRing 7s linear infinite;
+    }
+
+    .boot-ring.middle{
+      width:132px;
+      height:132px;
+      border-left-color:var(--accent2);
+      border-bottom-color:rgba(255,122,24,.8);
+      animation:spinRingReverse 5s linear infinite;
+    }
+
+    .boot-ring.inner{
+      width:84px;
+      height:84px;
+      border-top-color:rgba(255,255,255,.72);
+      border-right-color:rgba(255,122,24,.7);
+      animation:spinRing 3s linear infinite;
+    }
+
+    .boot-core{
+      position:relative;
+      z-index:2;
+      width:58px;
+      height:58px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      font-size:24px;
+      font-weight:900;
+      color:#fff;
+      background:
+        radial-gradient(circle at 35% 35%, rgba(255,255,255,.55), transparent 18%),
+        radial-gradient(circle at center, rgba(255,122,24,.45), rgba(25,211,107,.24), rgba(0,0,0,.5));
+      border:1px solid rgba(255,255,255,.16);
+      box-shadow:0 0 24px rgba(255,122,24,.22),0 0 24px rgba(25,211,107,.18);
+    }
+
+    .boot-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:8px;
+      margin-top:8px;
+    }
+
+    .boot-cell{
+      text-align:center;
+      font-size:11px;
+      padding:8px 6px;
+      border-radius:10px;
+      color:#c9d8e8;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.05);
+    }
+
+    .boot-progress{
+      height:12px;
+      margin-top:14px;
+      border-radius:999px;
+      overflow:hidden;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.06);
+    }
+
+    .boot-progress-fill{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));
+      box-shadow:0 0 18px rgba(255,122,24,.22);
+      transition:width .25s ease;
+    }
+
+    .boot-scanline{
+      position:absolute;
+      left:0;
+      right:0;
+      top:-30%;
+      height:24%;
+      background:linear-gradient(180deg, transparent, rgba(255,255,255,.08), transparent);
+      animation:bootScan 2.4s linear infinite;
+      pointer-events:none;
+    }
+
+    @keyframes spinRing{
+      to{transform:rotate(360deg)}
+    }
+
+    @keyframes spinRingReverse{
+      to{transform:rotate(-360deg)}
+    }
+
+    @keyframes bootScan{
+      0%{top:-30%}
+      100%{top:130%}
+    }
+
+    .footer-note{
+      text-align:center;
+      color:var(--muted);
+      font-size:13px;
+      margin:18px 0 8px;
+    }
+
+    @media (max-width:1040px){
+      .hud-row{
+        grid-template-columns:1fr;
+      }
+      .hero-grid{
+        grid-template-columns:1fr;
+      }
+      .main-layout{
+        grid-template-columns:1fr;
+      }
+    }
+
     @media (max-width:640px){
-      .wrap{padding:14px}.command-list{grid-template-columns:1fr}.controls{gap:7px}
-      button,input,select{width:100%}.row.responsive{flex-wrap:wrap}
+      .wrap{padding:14px}
+      .command-list{grid-template-columns:1fr}
+      .controls{gap:7px}
+      button,input,select{width:100%}
+      .row.responsive{flex-wrap:wrap}
+
+      .utility-dock{
+        position:sticky;
+        bottom:10px;
+        z-index:50;
+        grid-template-columns:repeat(3,1fr);
+        background:rgba(6,12,20,.82);
+        backdrop-filter:blur(16px);
+        padding:10px;
+        border-radius:18px;
+        border:1px solid rgba(255,255,255,.08);
+        box-shadow:0 12px 32px rgba(0,0,0,.25);
+      }
+
+      .util{
+        min-height:78px;
+        padding:10px 8px;
+        border-radius:14px;
+      }
+
+      .util small{
+        font-size:10px;
+      }
+
+      #jarvisOrb{
+        width:64px;
+        height:64px;
+        right:12px;
+        bottom:96px;
+      }
     }
   </style>
 </head>
 <body>
+  <div class="bg-grid"></div>
+  <div class="hud-glow"></div>
+  <div class="hud-glow2"></div>
+
   <div class="wrap">
     <header>
-      <div class="brand">
-        <h1>Jarvis — Web Voice Assistant</h1>
-        <div class="subtitle">Phase 2 monster build. Client-side PWA. Voice fix + boot UI + theme + history + install banner.</div>
+      <div class="hero">
+        <div class="hero-title">
+          <h1>Jarvis — Web Voice Assistant ULTRA</h1>
+        </div>
+        <div class="sub">
+          Premium futuristic single-file style assistant with wake word, speech reply, memory core,
+          floating AI orb, boot animation, launcher grid, command history, install banner, and mobile-ready HUD UI.
+        </div>
+
+        <div class="micro-badges">
+          <span class="micro-badge">Voice Recognition</span>
+          <span class="micro-badge">TTS Reply</span>
+          <span class="micro-badge">Wake Phrase</span>
+          <span class="micro-badge">PWA Ready</span>
+          <span class="micro-badge">Camera Tools</span>
+          <span class="micro-badge">Memory Core</span>
+          <span class="micro-badge">Theme Switcher</span>
+        </div>
       </div>
-      <div class="top-status">
-        <div class="status" id="listenStatusWrap">
-          <span class="dot" id="listenDot"></span>
+
+      <div class="status-wrap">
+        <div class="status-pill">
+          <span class="status-dot" id="listenDot"></span>
           <span id="listenStatus">Idle</span>
         </div>
-        <div style="height:8px"></div>
-        <div class="muted" style="font-size:12px">Language: <span id="langLabel">English (en-US)</span></div>
+        <div class="status-pill">
+          <span>Language:</span>
+          <span id="langLabel">English (en-US)</span>
+        </div>
       </div>
     </header>
 
-    <div id="installBanner" class="card" style="display:none; margin-top:12px; padding:12px;">
-      <div class="row wrapline" style="justify-content:space-between;">
-        <div>
-          <strong>Install Jarvis</strong>
-          <div class="hint">Add this app to your home screen for a cleaner app-like experience.</div>
+    <div class="hud-row">
+      <div class="glass hero-banner">
+        <div class="hero-grid">
+          <div class="hero-card">
+            <h3>System Overview</h3>
+            <p>
+              Jarvis runs fully in the browser with speech recognition, speech reply, quick web actions,
+              memory storage, screenshot, voice meter, camera access, launcher grid, and mobile-friendly controls.
+            </p>
+
+            <div class="controls">
+              <button id="btnStart" class="primary">Start Listening</button>
+              <button id="btnStop">Stop</button>
+              <button id="btnWake">Wake-word: <span id="wakeState">Off</span></button>
+              <button id="btnToggleVoice">Toggle Voice Reply</button>
+              <button id="btnClearLog" class="btn-ghost">Clear Log</button>
+            </div>
+          </div>
+
+          <div class="hero-card">
+            <h3>Quick Setup</h3>
+            <div class="section-sub">Tap once anywhere, then press <b>Test Voice</b>, then <b>Start Listening</b>.</div>
+
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
+              <button id="btnVoiceTest" class="smallbtn">Test Voice</button>
+              <button id="btnThemeToggle" class="smallbtn">Toggle Theme</button>
+              <button id="btnClearMemories" class="smallbtn">Clear Memories</button>
+              <button id="btnInstallApp" class="smallbtn">Install</button>
+            </div>
+
+            <div class="hero-stats">
+              <div class="stat-box">
+                <div class="stat-num" id="statCommandsMini">0</div>
+                <div class="stat-label">Commands Run</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-num" id="statMemoriesMini">0</div>
+                <div class="stat-label">Memories Saved</div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="row wrapline">
-          <button id="btnInstallApp" class="smallbtn">Install</button>
-          <button id="btnDismissInstall" class="smallbtn">Dismiss</button>
+      </div>
+
+      <div id="installBanner" class="glass install-banner">
+        <div class="row wrapline" style="justify-content:space-between;">
+          <div>
+            <strong>Install Jarvis</strong>
+            <div class="hint">Add this app to your home screen for cleaner app-like use.</div>
+          </div>
+          <div class="row wrapline">
+            <button id="btnInstallAppBanner" class="smallbtn">Install</button>
+            <button id="btnDismissInstall" class="smallbtn">Dismiss</button>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="controls">
-      <button id="btnStart" class="primary">Start Listening</button>
-      <button id="btnStop">Stop</button>
-      <button id="btnWake">Wake-word: <span id="wakeState">Off</span></button>
-      <label style="margin-left:6px;color:var(--muted)">Custom wake:</label>
-      <input id="wakeInput" type="text" placeholder="e.g. Oye Jarvis" style="width:170px" />
-      <button id="btnSaveWake" class="smallbtn">Save</button>
-      <button id="btnToggleVoice">Toggle Voice Reply</button>
-      <button id="btnClearLog" class="smallbtn">Clear Log</button>
-      <select id="langSelect">
-        <option value="en-US">English (en-US)</option>
-        <option value="hi-IN">Hindi (hi-IN)</option>
-      </select>
-      <label style="margin-left:8px;color:var(--muted)">Voice:</label>
-      <select id="voiceSelect"></select>
-      <button id="btnSaveMemory" title="Save memory">💾 Save Memory</button>
-      <button id="btnShowMemory" title="Show memories">🗂️ Memories</button>
-    </div>
-
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
-      <span class="pill">Voice Recognition</span>
-      <span class="pill">TTS</span>
-      <span class="pill">Wake Phrase</span>
-      <span class="pill">PWA</span>
-      <span class="pill">Camera</span>
-      <span class="pill">Wiki</span>
-      <span class="pill">Memory</span>
-      <span class="pill">Theme Switch</span>
-    </div>
-
-    <div class="panel">
-      <div id="left" class="card">
-        <div id="bootPanel" class="card" style="margin-bottom:12px; padding:12px;">
-          <div style="font-weight:800; letter-spacing:2px;">JARVIS SYSTEM BOOT</div>
-          <div id="bootText" class="hint" style="margin-top:8px;">Initializing systems...</div>
-          <div style="margin-top:10px; height:10px; background:rgba(255,255,255,.05); border-radius:999px; overflow:hidden;">
-            <div id="bootBar" style="height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--accent2)); transition:width .25s ease;"></div>
+    <div class="main-layout">
+      <div class="glass panel">
+        <div id="bootPanel" class="glass boot-panel" style="margin-bottom:12px; padding:14px;">
+          <div class="boot-topline">
+            <span>STARK INDUSTRIES // JARVIS OS</span>
+            <span id="bootPercent">0%</span>
           </div>
+
+          <div class="boot-title">INITIALIZING NEURAL ASSISTANT CORE</div>
+          <div id="bootText" class="hint" style="margin-top:8px;">Booting core modules...</div>
+
+          <div class="boot-ring-wrap">
+            <div class="boot-ring outer"></div>
+            <div class="boot-ring middle"></div>
+            <div class="boot-ring inner"></div>
+            <div class="boot-core">J</div>
+          </div>
+
+          <div class="boot-grid">
+            <div class="boot-cell">VOICE ENGINE</div>
+            <div class="boot-cell">HUD SYSTEM</div>
+            <div class="boot-cell">COMMAND BUS</div>
+            <div class="boot-cell">MEMORY CORE</div>
+            <div class="boot-cell">PWA SHELL</div>
+            <div class="boot-cell">CAMERA LINK</div>
+          </div>
+
+          <div class="boot-progress">
+            <div id="bootBar" class="boot-progress-fill"></div>
+          </div>
+
+          <div class="boot-scanline"></div>
         </div>
 
-        <h3>Say or type a command</h3>
-        <div id="transcript">Press <span class="kbd">Start Listening</span> and speak — or type below.</div>
+        <h3 class="section-title">Say or type a command</h3>
+
+        <div class="controls">
+          <label style="color:var(--muted)">Custom wake:</label>
+          <input id="wakeInput" type="text" placeholder="e.g. Oye Jarvis" style="min-width:160px" />
+          <button id="btnSaveWake" class="smallbtn">Save</button>
+
+          <select id="langSelect">
+            <option value="en-US">English (en-US)</option>
+            <option value="hi-IN">Hindi (hi-IN)</option>
+          </select>
+
+          <label style="color:var(--muted)">Voice:</label>
+          <select id="voiceSelect"></select>
+
+          <button id="btnSaveMemory" title="Save memory">💾 Save Memory</button>
+          <button id="btnShowMemory" title="Show memories">🗂️ Memories</button>
+        </div>
+
+        <div id="transcript" style="margin-top:12px">
+          Press Start Listening and speak — or type below.
+        </div>
 
         <div style="margin-top:12px" class="row responsive">
           <input id="cmdInput" type="text" placeholder="e.g. open youtube / what is the time / search cats" />
@@ -236,8 +1080,8 @@
         </div>
 
         <div class="hint">
-          Tip: Say <b>"Hey Jarvis"</b> or your custom wake phrase when wake-word is ON.
-          Try: <em>open youtube, search weather lucknow, time, wiki tesla, calculate 12*8, set timer 10 seconds</em>
+          Try commands like:
+          <em>open youtube, search cats, time, date, wiki tesla, calculate 17*8, set timer 10 seconds, open camera</em>
         </div>
 
         <div style="margin-top:12px">
@@ -258,8 +1102,8 @@
 
         <hr>
 
-        <h4>Extra shortcuts</h4>
-        <div class="row wrapline" style="margin-top:10px">
+        <h3 class="section-title">Extra shortcuts</h3>
+        <div class="row wrapline">
           <button class="smallbtn" id="btnWeather">Weather</button>
           <button class="smallbtn" id="btnNews">Top News</button>
           <button class="smallbtn" id="btnQuote">Motivate Me</button>
@@ -271,99 +1115,112 @@
 
         <hr>
 
-        <div>
-          <strong>Games</strong>
-          <div class="row wrapline" style="margin-top:8px">
-            <button id="btnRPS" class="smallbtn">Rock Paper Scissors</button>
-            <button id="btnGuess" class="smallbtn">Guess Number</button>
-          </div>
+        <h3 class="section-title">Mini Games</h3>
+        <div class="row wrapline">
+          <button id="btnRPS" class="smallbtn">Rock Paper Scissors</button>
+          <button id="btnGuess" class="smallbtn">Guess Number</button>
         </div>
 
         <hr>
 
-        <h4>Voice / Mood meter</h4>
+        <h3 class="section-title">Voice / Mood meter</h3>
         <div class="voice-meter" id="voiceMeter"><div></div></div>
         <div class="hint">Basic loudness meter using WebAudio.</div>
 
         <hr>
 
-        <h4>Face-login (simple snapshot compare)</h4>
+        <h3 class="section-title">Face-login (simple snapshot compare)</h3>
         <div class="row wrapline">
           <button id="btnFaceCapture" class="smallbtn">Capture Face (Enroll)</button>
           <button id="btnFaceLogin" class="smallbtn">Login with Face</button>
-          <div id="faceStatus" class="muted" style="margin-left:8px">No face enrolled</div>
+          <div id="faceStatus" class="hint" style="margin-left:8px">No face enrolled</div>
         </div>
         <div id="facePreview" style="margin-top:8px"></div>
 
         <div class="notice">
-          Note: Power off / restart / lock screen / flashlight are browser-safe simulations.
-          A normal website cannot truly control Android system functions like a native app.
+          Note: Power off, restart, lock screen, flashlight, and app launching are browser-safe simulations or shortcut redirects.
+          Real Android system control needs a native app wrapper.
+        </div>
+
+        <div class="glass" style="margin-top:16px; padding:14px;">
+          <h3 style="margin:0">App Launcher</h3>
+          <div class="hint">Fake launcher grid for quick app-style shortcuts.</div>
+
+          <div id="appGrid" class="app-grid">
+            <div class="app-tile" data-launch="youtube">▶<span>YouTube</span></div>
+            <div class="app-tile" data-launch="spotify">♫<span>Spotify</span></div>
+            <div class="app-tile" data-launch="google">G<span>Google</span></div>
+            <div class="app-tile" data-launch="maps">🗺<span>Maps</span></div>
+            <div class="app-tile" data-launch="github">⌘<span>GitHub</span></div>
+            <div class="app-tile" data-launch="news">📰<span>News</span></div>
+            <div class="app-tile" data-launch="weather">☁<span>Weather</span></div>
+            <div class="app-tile" data-launch="camera">📷<span>Camera</span></div>
+            <div class="app-tile" data-launch="gallery">🖼<span>Gallery</span></div>
+            <div class="app-tile" data-launch="whatsapp">💬<span>WhatsApp</span></div>
+            <div class="app-tile" data-launch="pw">PW<span>Physics Wallah</span></div>
+            <div class="app-tile" data-launch="translate">文<span>Translate</span></div>
+          </div>
+        </div>
+
+        <div class="utility-dock">
+          <div class="util" data-cmd="power off phone">Power Off<small>power off phone</small></div>
+          <div class="util" data-cmd="restart phone">Restart<small>restart phone</small></div>
+          <div class="util" data-cmd="flashlight on">Flashlight On<small>torch on</small></div>
+          <div class="util" data-cmd="flashlight off">Flashlight Off<small>torch off</small></div>
+          <div class="util" data-cmd="open camera">Open Camera<small>camera</small></div>
+          <div class="util" data-cmd="close camera">Close Camera<small>close camera</small></div>
+          <div class="util" data-cmd="open whatsapp">Open WhatsApp<small>whatsapp</small></div>
+          <div class="util" data-cmd="open gallery">Open Gallery<small>gallery</small></div>
+          <div class="util" data-cmd="battery status">Battery Status<small>battery</small></div>
+          <div class="util" data-cmd="device info">Device Info<small>info</small></div>
+          <div class="util" data-cmd="keep screen on">Keep Screen On<small>wake lock</small></div>
+          <div class="util" data-cmd="allow sleep">Allow Sleep<small>sleep</small></div>
+          <div class="util" data-cmd="vibrate">Vibrate<small>vibrate</small></div>
+          <div class="util" data-cmd="lock screen">Lock Screen<small>lock</small></div>
+          <div class="util" data-cmd="unlock screen">Unlock Screen<small>unlock</small></div>
         </div>
       </div>
 
-      <div id="right" class="card">
-        <h3>Activity Log</h3>
+      <div class="glass panel">
+        <h3 class="section-title">Activity Log</h3>
         <div id="log"></div>
 
-        <h4 style="margin-top:12px">Settings</h4>
-        <div class="row" style="margin-top:6px">
+        <h3 class="section-title" style="margin-top:14px">Settings</h3>
+        <div class="row" style="margin-top:8px">
           <label>Voice reply:</label>
           <input type="checkbox" id="chkVoice" checked />
         </div>
-        <div class="row" style="margin-top:6px">
+        <div class="row" style="margin-top:8px">
           <label>Continuous listen:</label>
           <input type="checkbox" id="chkContinuous" />
         </div>
-        <div class="row" style="margin-top:6px">
+        <div class="row" style="margin-top:8px">
           <label>Wake-word required:</label>
           <input type="checkbox" id="chkWakeReq" />
         </div>
 
-        <h4 style="margin-top:12px">Theme / Extras</h4>
-        <div class="row wrapline" style="margin-top:8px">
-          <button id="btnThemeToggle" class="smallbtn">Toggle Theme</button>
-          <button id="btnVoiceTest" class="smallbtn">Test Voice</button>
-          <button id="btnClearMemories" class="smallbtn">Clear Memories</button>
-        </div>
-
-        <h4 style="margin-top:12px">Recent Commands</h4>
+        <h3 class="section-title" style="margin-top:16px">Recent Commands</h3>
         <div id="recentCommands" class="mem-list"></div>
 
-        <h4 style="margin-top:12px">Jarvis Stats</h4>
+        <h3 class="section-title" style="margin-top:16px">Jarvis Stats</h3>
         <div id="statsBox" class="mem-list"></div>
 
-        <h4 style="margin-top:12px">Memories</h4>
+        <h3 class="section-title" style="margin-top:16px">Memories</h3>
         <div style="display:flex; gap:8px; margin-top:6px;">
           <input id="memInput" placeholder="Note to remember" />
           <button id="memAdd" class="smallbtn">Add</button>
         </div>
-        <div class="mem-list" id="memList"></div>
+        <div id="memList" class="mem-list"></div>
 
-        <div style="margin-top:10px" class="muted">Supported best in Chrome/Edge. Safari support is limited.</div>
+        <div class="section-sub" style="margin-top:14px">
+          Best tested in Chrome / Edge. On mobile, tap once before using voice reply.
+        </div>
       </div>
     </div>
 
-    <div class="utility-dock">
-      <div class="util" data-cmd="power off phone">Power Off<small>voice: power off phone</small></div>
-      <div class="util" data-cmd="restart phone">Restart<small>voice: restart phone</small></div>
-      <div class="util" data-cmd="flashlight on">Flashlight On<small>torch on</small></div>
-      <div class="util" data-cmd="flashlight off">Flashlight Off</div>
-      <div class="util" data-cmd="open camera">Open Camera</div>
-      <div class="util" data-cmd="close camera">Close Camera</div>
-      <div class="util" data-cmd="open whatsapp">Open WhatsApp</div>
-      <div class="util" data-cmd="open gallery">Open Gallery</div>
-      <div class="util" data-cmd="battery status">Battery Status</div>
-      <div class="util" data-cmd="device info">Device Info</div>
-      <div class="util" data-cmd="keep screen on">Keep Screen On</div>
-      <div class="util" data-cmd="allow sleep">Allow Sleep</div>
-      <div class="util" data-cmd="vibrate">Vibrate</div>
-      <div class="util" data-cmd="lock screen">Lock Screen</div>
-      <div class="util" data-cmd="unlock screen">Unlock Screen</div>
+    <div class="footer-note">
+      Built for you — say hi and try commands. DEVELOPED BY RUDRANSH PANDEY.
     </div>
-
-    <div class="badge-line">Features: speech, wake phrase, PWA, memories, wiki, screenshot, camera, games, quotes, timer, weather, news</div>
-
-    <footer>Built for you — say hi and try commands. DEVELOPED BY RUDRANSH PANDEY.</footer>
   </div>
 
   <div id="powerOverlay" class="overlay">
@@ -460,6 +1317,7 @@
 
       const installBanner = document.getElementById("installBanner");
       const btnInstallApp = document.getElementById("btnInstallApp");
+      const btnInstallAppBanner = document.getElementById("btnInstallAppBanner");
       const btnDismissInstall = document.getElementById("btnDismissInstall");
       const btnThemeToggle = document.getElementById("btnThemeToggle");
       const btnVoiceTest = document.getElementById("btnVoiceTest");
@@ -469,7 +1327,10 @@
       const bootPanel = document.getElementById("bootPanel");
       const bootText = document.getElementById("bootText");
       const bootBar = document.getElementById("bootBar");
+      const bootPercent = document.getElementById("bootPercent");
       const jarvisOrb = document.getElementById("jarvisOrb");
+      const statCommandsMini = document.getElementById("statCommandsMini");
+      const statMemoriesMini = document.getElementById("statMemoriesMini");
 
       let recognition = null;
       let listening = false;
@@ -488,22 +1349,36 @@
       let wakeLock = null;
       let deferredPrompt = null;
       let commandHistory = loadJson("jarvis_command_history", []);
-      let stats = loadJson("jarvis_stats", { commandsRun: 0, searches: 0, screenshots: 0, memoriesSaved: 0, jokesTold: 0 });
+      let stats = loadJson("jarvis_stats", {
+        commandsRun: 0,
+        searches: 0,
+        screenshots: 0,
+        memoriesSaved: 0,
+        jokesTold: 0
+      });
 
       const jokes = [
         "Why did the developer go broke? Because he used up all his cache.",
         "Why do programmers prefer dark mode? Because the light attracts bugs.",
-        "I told my computer I needed a break, and it said: no problem, I will go to sleep."
+        "I told my computer I needed a break, and it said: no problem, I will go to sleep.",
+        "Debugging is like being the detective in a crime movie where you are also the murderer."
       ];
 
       const quotes = [
         "The best time to plant a tree was 20 years ago. The second best time is now.",
         "Do not watch the clock; do what it does. Keep going.",
-        "You do not have to be great to start, but you have to start to be great."
+        "You do not have to be great to start, but you have to start to be great.",
+        "Discipline beats motivation when motivation goes missing."
       ];
 
       function escapeHtml(s) {
-        return String(s).replace(/[&<>"']/g, m => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[m]));
+        return String(s).replace(/[&<>"']/g, m => ({
+          "&":"&amp;",
+          "<":"&lt;",
+          ">":"&gt;",
+          '"':"&quot;",
+          "'":"&#39;"
+        }[m]));
       }
 
       function escapeRegex(str) {
@@ -553,8 +1428,13 @@
         }
       }
 
-      function getMemories() { return loadJson("jarvis_mems", []); }
-      function setMemories(items) { saveJson("jarvis_mems", items); }
+      function getMemories() {
+        return loadJson("jarvis_mems", []);
+      }
+
+      function setMemories(items) {
+        saveJson("jarvis_mems", items);
+      }
 
       function unlockSpeech() {
         try {
@@ -615,6 +1495,7 @@
 
         try {
           synth.cancel();
+
           const utter = new SpeechSynthesisUtterance(text);
           utter.lang = opts.lang || lang || "en-US";
           utter.rate = opts.rate || 1;
@@ -648,7 +1529,9 @@
         }
       }
 
-      function normalizeCommand(text) { return text.trim(); }
+      function normalizeCommand(text) {
+        return text.trim();
+      }
 
       function pushCommandHistory(cmd) {
         commandHistory.unshift(cmd);
@@ -663,6 +1546,7 @@
           recentCommands.textContent = "No recent commands";
           return;
         }
+
         commandHistory.forEach(cmd => {
           const chip = document.createElement("span");
           chip.className = "chip";
@@ -683,6 +1567,9 @@
           <div style="margin-top:6px"><strong>Memories saved:</strong> ${stats.memoriesSaved}</div>
           <div style="margin-top:6px"><strong>Jokes told:</strong> ${stats.jokesTold}</div>
         `;
+
+        statCommandsMini.textContent = stats.commandsRun;
+        statMemoriesMini.textContent = stats.memoriesSaved;
       }
 
       function saveStats() {
@@ -692,29 +1579,34 @@
 
       function runBootSequence() {
         const steps = [
-          "Initializing core systems...",
-          "Loading voice engine...",
-          "Calibrating microphone...",
-          "Mounting interface...",
-          "Starting Jarvis services...",
+          "Booting core modules...",
+          "Loading Stark HUD overlays...",
+          "Starting neural voice engine...",
+          "Calibrating microphone array...",
+          "Syncing memory core...",
+          "Mounting assistant interface...",
           "System ready."
         ];
 
         let i = 0;
         bootBar.style.width = "0%";
+        bootPercent.textContent = "0%";
         bootText.textContent = steps[0];
 
         const id = setInterval(() => {
           i++;
           const pct = Math.min(100, Math.round((i / steps.length) * 100));
           bootBar.style.width = pct + "%";
+          bootPercent.textContent = pct + "%";
           bootText.textContent = steps[Math.min(i, steps.length - 1)];
 
           if (i >= steps.length) {
             clearInterval(id);
-            setTimeout(() => { bootPanel.style.display = "none"; }, 700);
+            setTimeout(() => {
+              bootPanel.style.display = "none";
+            }, 900);
           }
-        }, 450);
+        }, 520);
       }
 
       function applySavedTheme() {
@@ -729,20 +1621,57 @@
       }
 
       function normalizeHindiAliases(text) {
+        const cleaned = text.trim();
+
         const map = [
-          [/samay|time batao|kitna baje/i, "time"],
-          [/date batao|aaj ki date/i, "date"],
-          [/youtube kholo|open youtube/i, "open youtube"],
-          [/google kholo|open google/i, "open google"],
-          [/mausam|weather/i, "weather"],
-          [/news kholo|khabar/i, "news"],
-          [/joke suna/i, "joke"],
-          [/camera kholo/i, "open camera"]
+          [/^(samay|time batao|kitna baje|current time)$/i, "time"],
+          [/^(aaj ki date|date batao|today date)$/i, "date"],
+          [/^(youtube kholo|youtube open karo|open youtube)$/i, "open youtube"],
+          [/^(google kholo|google open karo|open google)$/i, "open google"],
+          [/^(github kholo|github open karo)$/i, "open github"],
+          [/^(maps kholo|map kholo|open maps)$/i, "open maps"],
+          [/^(camera kholo|camera open karo)$/i, "open camera"],
+          [/^(camera band karo|close camera)$/i, "close camera"],
+          [/^(gallery kholo|photos kholo)$/i, "open gallery"],
+          [/^(whatsapp kholo|open whatsapp)$/i, "open whatsapp"],
+          [/^(pw kholo|physics wallah kholo|open pw)$/i, "open pw"],
+          [/^(news kholo|khabar dikhao|top news)$/i, "news"],
+          [/^(mausam|weather batao|weather)$/i, "weather"],
+          [/^(joke suna|joke bolo)$/i, "joke"],
+          [/^(motivate karo|motivation do|quote do)$/i, "motivate"],
+          [/^(screenshot lo|screen shot lo)$/i, "screenshot"],
+          [/^(flashlight on karo|torch on करो|torch on)$/i, "flashlight on"],
+          [/^(flashlight off karo|torch off करो|torch off)$/i, "flashlight off"],
+          [/^(lock screen करो|screen lock करो)$/i, "lock screen"],
+          [/^(unlock screen करो|screen unlock करो)$/i, "unlock screen"],
+          [/^(vibrate karo)$/i, "vibrate"],
+          [/^(restart karo|phone restart karo)$/i, "restart phone"],
+          [/^(shutdown karo|power off karo)$/i, "power off phone"],
+          [/^(screen on rakho|sleep mat hone do)$/i, "keep screen on"],
+          [/^(sleep allow karo)$/i, "allow sleep"]
         ];
+
         for (const [pattern, replacement] of map) {
-          if (pattern.test(text)) return replacement;
+          if (pattern.test(cleaned)) return replacement;
         }
-        return text;
+
+        if (/^(youtube pe )/i.test(cleaned)) {
+          return cleaned.replace(/^youtube pe /i, "play ") + " on youtube";
+        }
+
+        if (/^(spotify pe )/i.test(cleaned)) {
+          return cleaned.replace(/^spotify pe /i, "play ") + " on spotify";
+        }
+
+        if (/^(google pe search )/i.test(cleaned)) {
+          return cleaned.replace(/^google pe search /i, "search ");
+        }
+
+        if (/^(yaad rakho )/i.test(cleaned)) {
+          return cleaned.replace(/^yaad rakho /i, "remember ");
+        }
+
+        return cleaned;
       }
 
       function setupRecognition() {
@@ -774,7 +1703,9 @@
           log("Voice recognition stopped");
 
           if (chkContinuous.checked && recognition && !manuallyStopped) {
-            setTimeout(() => { try { recognition.start(); } catch {} }, 250);
+            setTimeout(() => {
+              try { recognition.start(); } catch {}
+            }, 250);
           }
         };
 
@@ -830,6 +1761,7 @@
       async function handleCommand(textRaw) {
         const text = textRaw.trim();
         if (!text) return;
+
         const lower = text.toLowerCase();
 
         if (/^(hi|hello|hey|hey jarvis|ok jarvis)\b/.test(lower)) {
@@ -868,8 +1800,12 @@
 
         if (lower.startsWith("search ") || lower.startsWith("google ")) {
           const q = text.replace(/^(search|google)\s+/i, "").trim();
-          if (!q) { speak("What do you want me to search?"); return; }
-          stats.searches++; saveStats();
+          if (!q) {
+            speak("What do you want me to search?");
+            return;
+          }
+          stats.searches++;
+          saveStats();
           speak("Searching Google for " + q);
           openUrl("https://www.google.com/search?q=" + encodeURIComponent(q));
           addTranscriptEntry("Jarvis: searched for " + q);
@@ -878,16 +1814,26 @@
 
         if (lower.startsWith("wiki ") || lower.startsWith("wikipedia ")) {
           const term = text.replace(/^(wiki|wikipedia)\s+/i, "").trim();
-          if (!term) { speak("What do you want from Wikipedia?"); return; }
+          if (!term) {
+            speak("What do you want from Wikipedia?");
+            return;
+          }
+
           speak("Searching Wikipedia for " + term);
           addTranscriptEntry("Jarvis: fetching Wikipedia for " + term);
 
           try {
             const api = "https://en.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(term);
             const r = await fetch(api);
-            if (!r.ok) { speak("No Wikipedia page found for " + term); return; }
+            if (!r.ok) {
+              speak("No Wikipedia page found for " + term);
+              return;
+            }
             const j = await r.json();
-            const extract = j.extract ? j.extract.split(". ").slice(0, 2).join(". ") + "." : "No summary available.";
+            const extract = j.extract
+              ? j.extract.split(". ").slice(0, 2).join(". ") + "."
+              : "No summary available.";
+
             speak(extract);
             addTranscriptEntry("Wiki: " + extract);
           } catch (e) {
@@ -897,9 +1843,20 @@
           return;
         }
 
-        if (lower.startsWith("calculate ") || lower.startsWith("what is ") || /^[0-9+\-*/(). %]+$/.test(lower)) {
-          const expr = text.replace(/^(calculate|what is)\s+/i, "").replace(/[^0-9+\-*/(). %]/g, "");
-          if (!expr) { speak("I could not parse the expression"); return; }
+        if (
+          lower.startsWith("calculate ") ||
+          lower.startsWith("what is ") ||
+          /^[0-9+\-*/(). %]+$/.test(lower)
+        ) {
+          const expr = text
+            .replace(/^(calculate|what is)\s+/i, "")
+            .replace(/[^0-9+\-*/(). %]/g, "");
+
+          if (!expr) {
+            speak("I could not parse the expression");
+            return;
+          }
+
           try {
             const val = Function(`"use strict"; return (${expr})`)();
             speak("The result is " + val);
@@ -913,12 +1870,18 @@
 
         if (lower.startsWith("set timer") || lower.startsWith("timer ")) {
           const m = lower.match(/(\d+)\s*(seconds|second|minutes|minute|secs|mins)?/);
-          if (!m) { speak("Please tell me the time in seconds or minutes"); return; }
+          if (!m) {
+            speak("Please tell me the time in seconds or minutes");
+            return;
+          }
+
           const num = parseInt(m[1], 10);
           const unit = (m[2] || "seconds").toLowerCase();
           const ms = unit.startsWith("min") ? num * 60 * 1000 : num * 1000;
+
           speak(`Timer set for ${num} ${unit.startsWith("min") ? "minutes" : "seconds"}`);
           addTranscriptEntry(`Timer: ${num} ${unit}`);
+
           setTimeout(() => {
             speak(`Timer finished: ${num} ${unit.startsWith("min") ? "minutes" : "seconds"}`);
             alert(`Timer finished: ${num} ${unit}`);
@@ -934,7 +1897,8 @@
 
         if (lower.includes("joke")) {
           const joke = jokes[Math.floor(Math.random() * jokes.length)];
-          stats.jokesTold++; saveStats();
+          stats.jokesTold++;
+          saveStats();
           speak(joke);
           addTranscriptEntry("Joke: " + joke);
           return;
@@ -966,7 +1930,13 @@
             const phrase = m[1];
             const target = m[2];
             speak("Translating to " + target);
-            openUrl("https://translate.google.com/?sl=auto&tl=" + encodeURIComponent(target) + "&text=" + encodeURIComponent(phrase) + "&op=translate");
+            openUrl(
+              "https://translate.google.com/?sl=auto&tl=" +
+              encodeURIComponent(target) +
+              "&text=" +
+              encodeURIComponent(phrase) +
+              "&op=translate"
+            );
           } else {
             speak("Opening Google Translate");
             openUrl("https://translate.google.com");
@@ -980,7 +1950,8 @@
             const mems = getMemories();
             mems.push({ text: mem, time: Date.now() });
             setMemories(mems);
-            stats.memoriesSaved++; saveStats();
+            stats.memoriesSaved++;
+            saveStats();
             speak("Done. I will remember: " + mem);
             addTranscriptEntry("Memory saved: " + mem);
             renderMemories();
@@ -990,9 +1961,16 @@
           return;
         }
 
-        if (lower.includes("what do you remember") || lower.includes("list memories") || lower.includes("what did i ask you to remember")) {
+        if (
+          lower.includes("what do you remember") ||
+          lower.includes("list memories") ||
+          lower.includes("what did i ask you to remember")
+        ) {
           const mems = getMemories();
-          if (mems.length === 0) { speak("You have no saved memories."); return; }
+          if (mems.length === 0) {
+            speak("You have no saved memories.");
+            return;
+          }
           speak(`You asked me to remember ${mems.length} items. I will show them now.`);
           renderMemories();
           showMemories();
@@ -1004,36 +1982,103 @@
           return;
         }
 
-        if (lower.includes("power off") || lower.includes("shutdown")) { powerOffAnimation(); return; }
-        if (lower.includes("restart")) { restartAnimation(); return; }
-        if (lower.includes("flashlight on") || lower.includes("torch on")) { flashlight(true); return; }
-        if (lower.includes("flashlight off") || lower.includes("torch off")) { flashlight(false); return; }
-        if (lower.includes("open camera") || lower.includes("show camera")) { openCamera(); return; }
-        if (lower.includes("close camera") || lower.includes("hide camera")) { closeCamera(); return; }
+        if (lower.includes("power off") || lower.includes("shutdown")) {
+          powerOffAnimation();
+          return;
+        }
+
+        if (lower.includes("restart")) {
+          restartAnimation();
+          return;
+        }
+
+        if (lower.includes("flashlight on") || lower.includes("torch on")) {
+          flashlight(true);
+          return;
+        }
+
+        if (lower.includes("flashlight off") || lower.includes("torch off")) {
+          flashlight(false);
+          return;
+        }
+
+        if (lower.includes("open camera") || lower.includes("show camera")) {
+          openCamera();
+          return;
+        }
+
+        if (lower.includes("close camera") || lower.includes("hide camera")) {
+          closeCamera();
+          return;
+        }
 
         if (lower.includes("youtube")) {
-          const song = text.replace(/play/i, "").replace(/on youtube/i, "").replace(/youtube/i, "").trim();
-          if (!song) speak("Please tell song name");
-          else {
+          const song = text
+            .replace(/play/i, "")
+            .replace(/on youtube/i, "")
+            .replace(/youtube/i, "")
+            .trim();
+
+          if (!song) {
+            speak("Please tell song name");
+          } else {
             openUrl("https://www.youtube.com/results?search_query=" + encodeURIComponent(song));
             speak("Opening YouTube for " + song);
           }
           return;
         }
 
-        if (lower.includes("whatsapp")) { openWhatsApp(); speak("Opening WhatsApp"); return; }
-        if (lower.includes("gallery")) { openGallery(); return; }
-        if (lower.includes("keep screen on") || lower.includes("stay awake")) { keepScreenOn(); return; }
-        if (lower.includes("allow sleep")) { allowSleep(); return; }
-        if (lower.includes("vibrate")) { vibrate(); return; }
-        if (lower.includes("lock screen")) { lockScreen(); return; }
-        if (lower.includes("unlock screen")) { unlockScreen(); return; }
-        if (lower.includes("news") || lower.includes("top news")) { openNews(); return; }
+        if (lower.includes("whatsapp")) {
+          openWhatsApp();
+          speak("Opening WhatsApp");
+          return;
+        }
+
+        if (lower.includes("gallery")) {
+          openGallery();
+          return;
+        }
+
+        if (lower.includes("keep screen on") || lower.includes("stay awake")) {
+          keepScreenOn();
+          return;
+        }
+
+        if (lower.includes("allow sleep")) {
+          allowSleep();
+          return;
+        }
+
+        if (lower.includes("vibrate")) {
+          vibrate();
+          return;
+        }
+
+        if (lower.includes("lock screen")) {
+          lockScreen();
+          return;
+        }
+
+        if (lower.includes("unlock screen")) {
+          unlockScreen();
+          return;
+        }
+
+        if (lower.includes("news") || lower.includes("top news")) {
+          openNews();
+          return;
+        }
 
         if (lower.includes("spotify")) {
-          const song = text.replace(/play/i, "").replace(/on spotify/i, "").replace(/spotify/i, "").trim();
-          if (!song) speak("Please tell song name");
-          else {
+          const song = text
+            .replace(/play/i, "")
+            .replace(/on spotify/i, "")
+            .replace(/spotify/i, "")
+            .trim();
+
+          if (!song) {
+            speak("Please tell song name");
+          } else {
             openUrl("https://open.spotify.com/search/" + encodeURIComponent(song));
             speak("Playing " + song + " on Spotify");
           }
@@ -1042,21 +2087,26 @@
 
         if (lower.includes("physics wallah") || lower.includes("open pw") || lower.includes("play pw")) {
           speak("Opening Physics Wallah");
-          try { window.location.href = "intent://#Intent;package=in.eduwall.pwclassroom;scheme=pw;end"; } catch {}
+          try {
+            window.location.href = "intent://#Intent;package=in.eduwall.pwclassroom;scheme=pw;end";
+          } catch {}
           setTimeout(() => openUrl("https://www.pw.live/"), 800);
           return;
         }
 
         speak("I did not understand. Do you want me to search the web?");
         if (confirm(`Search web for "${text}"?`)) {
-          stats.searches++; saveStats();
+          stats.searches++;
+          saveStats();
           openUrl("https://www.google.com/search?q=" + encodeURIComponent(text));
         }
       }
 
       function stopListening() {
         manuallyStopped = true;
-        if (recognition) { try { recognition.stop(); } catch {} }
+        if (recognition) {
+          try { recognition.stop(); } catch {}
+        }
         listening = false;
         setListeningUI(false);
         stopVoiceMeter();
@@ -1066,7 +2116,10 @@
       function renderMemories() {
         const mems = getMemories();
         memList.innerHTML = "";
-        if (mems.length === 0) { memList.textContent = "No memories saved"; return; }
+        if (mems.length === 0) {
+          memList.textContent = "No memories saved";
+          return;
+        }
 
         mems.slice().reverse().forEach((m, i) => {
           const card = document.createElement("div");
@@ -1075,7 +2128,9 @@
           card.innerHTML = `
             <strong style="color:#9ae6b4">${new Date(m.time).toLocaleString()}</strong>
             <div style="margin-top:4px">${escapeHtml(m.text)}</div>
-            <div style="margin-top:6px"><button class="mem-del smallbtn" data-i="${mems.length - 1 - i}">Delete</button></div>
+            <div style="margin-top:6px">
+              <button class="smallbtn mem-del" data-i="${mems.length - 1 - i}">Delete</button>
+            </div>
           `;
           memList.appendChild(card);
         });
@@ -1100,7 +2155,10 @@
       async function openCamera() {
         try {
           cameraOverlay.style.display = "flex";
-          if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
+          if (camStream) {
+            camStream.getTracks().forEach(t => t.stop());
+            camStream = null;
+          }
           camStream = await navigator.mediaDevices.getUserMedia({
             video: { facingMode: usingBackCam ? { ideal: "environment" } : "user" },
             audio: false
@@ -1115,7 +2173,10 @@
 
       function closeCamera() {
         cameraOverlay.style.display = "none";
-        if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
+        if (camStream) {
+          camStream.getTracks().forEach(t => t.stop());
+          camStream = null;
+        }
         log("Camera closed");
       }
 
@@ -1127,7 +2188,10 @@
 
       async function batteryStatus() {
         try {
-          if (!("getBattery" in navigator)) { alert("Battery API not supported"); return; }
+          if (!("getBattery" in navigator)) {
+            alert("Battery API not supported");
+            return;
+          }
           const b = await navigator.getBattery();
           const pct = Math.round(b.level * 100);
           const charging = b.charging ? "charging" : "not charging";
@@ -1172,15 +2236,22 @@
 
       function vibrate() {
         if ("vibrate" in navigator) {
-          navigator.vibrate([60, 40, 60, 40, 120]);
+          navigator.vibrate([60,40,60,40,120]);
           log("Vibration pattern played");
         } else {
           alert("Vibration not supported on this device");
         }
       }
 
-      function lockScreen() { lockOverlay.style.display = "flex"; log("Screen locked (UI)"); }
-      function unlockScreen() { lockOverlay.style.display = "none"; log("Screen unlocked (UI)"); }
+      function lockScreen() {
+        lockOverlay.style.display = "flex";
+        log("Screen locked (UI)");
+      }
+
+      function unlockScreen() {
+        lockOverlay.style.display = "none";
+        log("Screen unlocked (UI)");
+      }
 
       function openWhatsApp() {
         try {
@@ -1192,7 +2263,10 @@
         log("WhatsApp request");
       }
 
-      function openGallery() { openUrl("https://photos.google.com"); log("Gallery opened"); }
+      function openGallery() {
+        openUrl("https://photos.google.com");
+        log("Gallery opened");
+      }
 
       function powerOffAnimation() {
         powerOverlay.style.display = "flex";
@@ -1227,9 +2301,15 @@
         if (typeof html2canvas === "undefined") {
           await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
         }
+
         try {
           speak("Taking screenshot");
-          const canvas = await html2canvas(document.documentElement, { logging: false, useCORS: true, scale: 1 });
+          const canvas = await html2canvas(document.documentElement, {
+            logging: false,
+            useCORS: true,
+            scale: 1
+          });
+
           const url = canvas.toDataURL("image/png");
           const a = document.createElement("a");
           a.href = url;
@@ -1237,7 +2317,8 @@
           document.body.appendChild(a);
           a.click();
           a.remove();
-          stats.screenshots++; saveStats();
+          stats.screenshots++;
+          saveStats();
           log("Screenshot taken and downloaded");
         } catch (e) {
           log("Screenshot failed: " + e.message, "err");
@@ -1245,43 +2326,58 @@
         }
       }
 
-      function openNews() { speak("Opening top news"); openUrl("https://news.google.com/topstories?hl=en-US&gl=US&ceid=US:en"); }
+      function openNews() {
+        speak("Opening top news");
+        openUrl("https://news.google.com/topstories?hl=en-US&gl=US&ceid=US:en");
+      }
 
       function runSelfDestruct() {
         const c = boomCanvas;
-        c.width = window.innerWidth; c.height = window.innerHeight; c.style.display = "block";
+        c.width = window.innerWidth;
+        c.height = window.innerHeight;
+        c.style.display = "block";
         const ctx = c.getContext("2d");
         const sparks = [];
+
         for (let i = 0; i < 220; i++) {
           sparks.push({
-            x: window.innerWidth / 2 + (Math.random() - 0.5) * 200,
-            y: window.innerHeight / 2 + (Math.random() - 0.5) * 200,
-            vx: (Math.random() - 0.5) * 14,
-            vy: (Math.random() - 0.9) * 14 - 4,
-            r: Math.random() * 6 + 2,
-            life: Math.random() * 100 + 40,
-            color: `rgba(${200 + Math.floor(Math.random() * 55)},${Math.floor(Math.random() * 140)},0,`
+            x: window.innerWidth/2 + (Math.random()-0.5)*200,
+            y: window.innerHeight/2 + (Math.random()-0.5)*200,
+            vx: (Math.random()-0.5)*14,
+            vy: (Math.random()-0.9)*14 - 4,
+            r: Math.random()*6+2,
+            life: Math.random()*100+40,
+            color: `rgba(${200+Math.floor(Math.random()*55)},${Math.floor(Math.random()*140)},0,`
           });
         }
 
         let t = 0;
         speak("Self destruct in 3... 2... 1...");
         const originalTransform = document.body.style.transform || "";
+
         const id = setInterval(() => {
           ctx.fillStyle = "rgba(0,0,0,.12)";
-          ctx.fillRect(0, 0, c.width, c.height);
+          ctx.fillRect(0,0,c.width,c.height);
+
           sparks.forEach(p => {
-            p.x += p.vx; p.y += p.vy; p.vy += .18; p.life--;
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.18;
+            p.life--;
             ctx.beginPath();
-            ctx.fillStyle = p.color + (p.life / 140) + ")";
-            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = p.color + (p.life/140) + ")";
+            ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
             ctx.fill();
           });
+
           t++;
-          if (t % 6 === 0) document.body.style.transform = `translate(${(Math.random() - .5) * 8}px, ${(Math.random() - .5) * 8}px)`;
+          if (t % 6 === 0) {
+            document.body.style.transform = `translate(${(Math.random()-0.5)*8}px, ${(Math.random()-0.5)*8}px)`;
+          }
+
           if (t > 160) {
             clearInterval(id);
-            ctx.clearRect(0, 0, c.width, c.height);
+            ctx.clearRect(0,0,c.width,c.height);
             c.style.display = "none";
             document.body.style.transform = originalTransform;
             log("Self-destruct animation done");
@@ -1290,25 +2386,26 @@
       }
 
       function playRPS() {
-        const choices = ["rock", "paper", "scissors"];
+        const choices = ["rock","paper","scissors"];
         const user = prompt("Choose rock, paper or scissors:");
         if (!user) return;
         const u = user.toLowerCase();
         if (!choices.includes(u)) { alert("Invalid choice"); return; }
-        const bot = choices[Math.floor(Math.random() * 3)];
+        const bot = choices[Math.floor(Math.random()*3)];
         let res = "Draw";
-        if ((u === "rock" && bot === "scissors") || (u === "paper" && bot === "rock") || (u === "scissors" && bot === "paper")) res = "You win!";
+        if ((u==="rock"&&bot==="scissors") || (u==="paper"&&bot==="rock") || (u==="scissors"&&bot==="paper")) res = "You win!";
         else if (u !== bot) res = "You lose!";
         speak(`You chose ${u}. I chose ${bot}. ${res}`);
         alert(`You: ${u}\nJarvis: ${bot}\n\n${res}`);
       }
 
       function playGuess() {
-        const target = Math.floor(Math.random() * 50) + 1;
+        const target = Math.floor(Math.random()*50)+1;
         let tries = 0;
         let ok = false;
+
         while (tries < 7) {
-          const g = prompt("Guess the number (1-50). Attempts left: " + (7 - tries));
+          const g = prompt("Guess the number (1-50). Attempts left: " + (7-tries));
           if (g === null) return;
           const n = parseInt(g, 10);
           if (Number.isNaN(n)) { alert("Enter a number"); continue; }
@@ -1326,6 +2423,7 @@
             alert("Lower");
           }
         }
+
         if (!ok) {
           speak("Out of attempts. The number was " + target);
           alert("Out of attempts. The number was " + target);
@@ -1362,12 +2460,13 @@
 
         let sum = 0, len = 0;
         for (let i = 0; i < da.length; i += 4) {
-          const la = 0.299 * da[i] + 0.587 * da[i + 1] + 0.114 * da[i + 2];
-          const lb = 0.299 * db[i] + 0.587 * db[i + 1] + 0.114 * db[i + 2];
-          sum += Math.abs(la - lb);
+          const la = 0.299*da[i] + 0.587*da[i+1] + 0.114*da[i+2];
+          const lb = 0.299*db[i] + 0.587*db[i+1] + 0.114*db[i+2];
+          sum += Math.abs(la-lb);
           len++;
         }
-        return sum / (len * 255);
+
+        return sum / (len*255);
       }
 
       function renderFacePreview(data) {
@@ -1379,6 +2478,7 @@
 
       function handleExtraCommand(raw) {
         const lower = raw.toLowerCase().trim();
+
         if (/^(power\s*off( phone)?|shutdown( phone)?)$/.test(lower)) { powerOffAnimation(); return true; }
         if (/^(restart( phone)?|reboot( phone)?)$/.test(lower)) { restartAnimation(); return true; }
         if (/^(flashlight|torch) on$/.test(lower)) { flashlight(true); return true; }
@@ -1398,32 +2498,39 @@
         if (/^weather$/.test(lower)) { openUrl("https://wttr.in/?format=3"); return true; }
         if (/^play spotify$/.test(lower)) { openUrl("https://open.spotify.com/collection/playlists"); return true; }
         if (/^screenshot$/.test(lower)) { takeScreenshot(); return true; }
-        if (/^motivate$/.test(lower)) { speak(quotes[Math.floor(Math.random() * quotes.length)]); return true; }
+        if (/^motivate$/.test(lower)) { speak(quotes[Math.floor(Math.random()*quotes.length)]); return true; }
         if (/^self destruct$/.test(lower)) { runSelfDestruct(); return true; }
         if (/^play music$/.test(lower)) { openUrl("https://www.youtube.com/results?search_query=lofi+beats"); return true; }
+
         if (/^remember /.test(lower)) {
           const mem = raw.replace(/^remember\s+/i, "").trim();
           if (mem) {
             const mems = getMemories();
             mems.push({ text: mem, time: Date.now() });
             setMemories(mems);
-            stats.memoriesSaved++; saveStats();
+            stats.memoriesSaved++;
+            saveStats();
             renderMemories();
             speak("Memory saved");
           }
           return true;
         }
+
         if (lower.startsWith("open ") && (lower.includes("pw") || lower.includes("physics"))) {
           openUrl("https://www.pw.live/");
           return true;
         }
+
         return false;
       }
 
       async function startVoiceMeter() {
         try {
           if (!navigator.mediaDevices?.getUserMedia) return;
-          if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+          if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          }
 
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
           meterSource = audioContext.createMediaStreamSource(stream);
@@ -1449,20 +2556,26 @@
       }
 
       function stopVoiceMeter() {
-        if (meterAnimationId) { cancelAnimationFrame(meterAnimationId); meterAnimationId = null; }
+        if (meterAnimationId) {
+          cancelAnimationFrame(meterAnimationId);
+          meterAnimationId = null;
+        }
+
         if (meterSource?.mediaStream) {
           meterSource.mediaStream.getTracks().forEach(t => t.stop());
           try { meterSource.disconnect(); } catch {}
         }
+
         if (analyser) {
           try { analyser.disconnect(); } catch {}
           analyser = null;
         }
+
         voiceMeterFill.style.width = "0%";
       }
 
       function init() {
-        transcriptEl.innerHTML = 'Press <span class="kbd">Start Listening</span> and speak — or type below.';
+        transcriptEl.innerHTML = "Press Start Listening and speak — or type below.";
         lang = langSelect.value;
         wakeInput.value = customWake;
 
@@ -1494,6 +2607,26 @@
           });
         });
 
+        document.querySelectorAll(".app-tile").forEach(tile => {
+          tile.addEventListener("click", () => {
+            const app = tile.getAttribute("data-launch");
+            switch (app) {
+              case "youtube": runCommandPipeline("open youtube"); break;
+              case "spotify": runCommandPipeline("play spotify"); break;
+              case "google": runCommandPipeline("open google"); break;
+              case "maps": runCommandPipeline("open maps"); break;
+              case "github": runCommandPipeline("open github"); break;
+              case "news": runCommandPipeline("news"); break;
+              case "weather": runCommandPipeline("weather"); break;
+              case "camera": runCommandPipeline("open camera"); break;
+              case "gallery": runCommandPipeline("open gallery"); break;
+              case "whatsapp": runCommandPipeline("open whatsapp"); break;
+              case "pw": runCommandPipeline("open pw"); break;
+              case "translate": openUrl("https://translate.google.com"); break;
+            }
+          });
+        });
+
         document.body.addEventListener("click", unlockSpeech, { once: true });
       }
 
@@ -1503,13 +2636,16 @@
         installBanner.style.display = "block";
       });
 
-      btnInstallApp?.addEventListener("click", async () => {
+      async function doInstall() {
         if (!deferredPrompt) return;
         deferredPrompt.prompt();
         await deferredPrompt.userChoice;
         deferredPrompt = null;
         installBanner.style.display = "none";
-      });
+      }
+
+      btnInstallApp?.addEventListener("click", doInstall);
+      btnInstallAppBanner?.addEventListener("click", doInstall);
 
       btnDismissInstall?.addEventListener("click", () => {
         installBanner.style.display = "none";
@@ -1539,7 +2675,7 @@
 
       btnClearLog.addEventListener("click", () => {
         logEl.innerHTML = "";
-        transcriptEl.innerHTML = 'Press <span class="kbd">Start Listening</span> and speak — or type below.';
+        transcriptEl.innerHTML = "Press Start Listening and speak — or type below.";
       });
 
       chkContinuous.addEventListener("change", () => {
@@ -1582,7 +2718,9 @@
       btnSpotify.addEventListener("click", () => runCommandPipeline("play spotify"));
       btnTranslate.addEventListener("click", () => {
         const phrase = prompt("Phrase to translate:");
-        if (phrase) openUrl("https://translate.google.com/?sl=auto&tl=en&text=" + encodeURIComponent(phrase) + "&op=translate");
+        if (phrase) {
+          openUrl("https://translate.google.com/?sl=auto&tl=en&text=" + encodeURIComponent(phrase) + "&op=translate");
+        }
       });
       btnScreenshot.addEventListener("click", takeScreenshot);
       btnSelfDestruct.addEventListener("click", runSelfDestruct);
@@ -1595,7 +2733,8 @@
         const mems = getMemories();
         mems.push({ text: txt, time: Date.now() });
         setMemories(mems);
-        stats.memoriesSaved++; saveStats();
+        stats.memoriesSaved++;
+        saveStats();
         speak("Saved that memory.");
         log("Memory saved: " + txt);
         renderMemories();
@@ -1609,7 +2748,8 @@
         const mems = getMemories();
         mems.push({ text: t, time: Date.now() });
         setMemories(mems);
-        stats.memoriesSaved++; saveStats();
+        stats.memoriesSaved++;
+        saveStats();
         memInput.value = "";
         renderMemories();
         speak("Memory added.");
@@ -1617,7 +2757,10 @@
 
       btnSaveWake.addEventListener("click", () => {
         const w = wakeInput.value.trim().toLowerCase();
-        if (!w) { alert("Enter wake phrase"); return; }
+        if (!w) {
+          alert("Enter wake phrase");
+          return;
+        }
         customWake = w;
         localStorage.setItem("jarvis_wake", w);
         speak("Custom wake phrase saved as " + w);
@@ -1675,7 +2818,11 @@
       });
 
       btnFaceLogin.addEventListener("click", async () => {
-        if (!faceDataUrl) { alert("No face enrolled. Capture first."); return; }
+        if (!faceDataUrl) {
+          alert("No face enrolled. Capture first.");
+          return;
+        }
+
         try {
           const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
           const video = document.createElement("video");
@@ -1736,12 +2883,22 @@
       unlockBtn.addEventListener("click", unlockScreen);
 
       window.Jarvis = {
-        speak, takeScreenshot, openCamera, closeCamera, flashlight, restartAnimation,
-        powerOffAnimation, openNews, keepScreenOn, allowSleep, showMemories, renderMemories
+        speak,
+        takeScreenshot,
+        openCamera,
+        closeCamera,
+        flashlight,
+        restartAnimation,
+        powerOffAnimation,
+        openNews,
+        keepScreenOn,
+        allowSleep,
+        showMemories,
+        renderMemories
       };
 
       init();
     })();
   </script>
 </body>
-  </html>
+</html>
