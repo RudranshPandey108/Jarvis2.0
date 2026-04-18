@@ -1,0 +1,12 @@
+{
+  "name": "Jarvis Web Voice Assistant",
+  "short_name": "Jarvis",
+  "description": "Futuristic client-side voice assistant PWA",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#081018",
+  "theme_color": "#081018",
+  "orientation": "portrait-primary",
+  "icons": []
+}
