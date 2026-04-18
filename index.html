@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#081018" />
   <meta name="description" content="Jarvis Web Voice Assistant Ultimate PWA" />
-  <title>Jarvis — Web Voice Assistant (Ultimate)</title>
+  <title>Jarvis — Web Voice Assistant (Phase 2)</title>
   <link rel="manifest" href="manifest.json">
 
   <style>
@@ -26,17 +26,8 @@
       --shadow:0 18px 44px rgba(0,0,0,.38);
       --radius:16px;
     }
-
-    *{
-      box-sizing:border-box;
-      -webkit-tap-highlight-color:transparent;
-    }
-
-    html,body{
-      height:100%;
-      margin:0;
-    }
-
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{height:100%;margin:0}
     body{
       font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
       background:
@@ -44,443 +35,125 @@
         radial-gradient(circle at bottom left, rgba(34,197,94,.08), transparent 30%),
         linear-gradient(180deg,var(--bg2) 0%,var(--bg) 100%);
       color:var(--text);
+      transition:background .25s ease,color .25s ease;
     }
-
-    .wrap{
-      max-width:1140px;
-      margin:0 auto;
-      padding:18px;
-    }
-
-    header{
-      display:flex;
-      gap:16px;
-      flex-wrap:wrap;
-      align-items:flex-start;
-      margin-bottom:14px;
-    }
-
+    .wrap{max-width:1140px;margin:0 auto;padding:18px}
+    header{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;margin-bottom:14px}
     .brand{min-width:0}
-    h1{
-      margin:0;
-      font-size:24px;
-      letter-spacing:.3px;
-    }
-
-    .subtitle{
-      color:var(--muted);
-      font-size:13px;
-      margin-top:5px;
-      line-height:1.45;
-    }
-
-    .top-status{
-      margin-left:auto;
-      text-align:right;
-    }
-
+    h1{margin:0;font-size:24px;letter-spacing:.3px}
+    .subtitle{color:var(--muted);font-size:13px;margin-top:5px;line-height:1.45}
+    .top-status{margin-left:auto;text-align:right}
     .status{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      background:rgba(255,255,255,.04);
-      border:1px solid var(--line);
-      color:var(--muted);
-      font-size:13px;
-      backdrop-filter: blur(8px);
+      display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;
+      background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--muted);font-size:13px;backdrop-filter:blur(8px)
     }
-
-    .dot{
-      width:8px;
-      height:8px;
-      border-radius:50%;
-      background:#888;
-    }
-
-    .dot.live{
-      background:var(--success);
-      box-shadow:0 0 12px rgba(34,197,94,.6);
-    }
-
-    .controls{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      margin:12px 0 0;
-    }
-
-    button,select,input,textarea{
-      font:inherit;
-    }
-
+    .dot{width:8px;height:8px;border-radius:50%;background:#888}
+    .dot.live{background:var(--success);box-shadow:0 0 12px rgba(34,197,94,.6)}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 0}
+    button,select,input,textarea{font:inherit}
     button{
-      background:var(--card);
-      color:var(--text);
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:10px 12px;
-      cursor:pointer;
-      transition:.18s ease;
+      background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:12px;
+      padding:10px 12px;cursor:pointer;transition:.18s ease
     }
-
-    button:hover{
-      transform:translateY(-1px);
-      filter:brightness(1.04);
-    }
-
-    button.primary{
-      background:linear-gradient(90deg,var(--accent),var(--accent2));
-      color:#07160d;
-      font-weight:800;
-    }
-
-    button.smallbtn{
-      padding:8px 10px;
-      font-size:13px;
-    }
-
+    button:hover{transform:translateY(-1px);filter:brightness(1.04)}
+    button.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#07160d;font-weight:800}
+    button.smallbtn{padding:8px 10px;font-size:13px}
     input[type="text"],input[type="search"],textarea,select{
-      background:transparent;
-      color:var(--text);
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:10px 12px;
-      outline:none;
+      background:transparent;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px 12px;outline:none
     }
-
-    input::placeholder,textarea::placeholder{
-      color:#8da0b3;
-    }
-
-    select{
-      background:var(--card);
-    }
-
-    .panel{
-      display:grid;
-      grid-template-columns:minmax(0,1fr) 410px;
-      gap:16px;
-      margin-top:18px;
-    }
-
+    input::placeholder,textarea::placeholder{color:#8da0b3}
+    select{background:var(--card)}
+    .panel{display:grid;grid-template-columns:minmax(0,1fr) 410px;gap:16px;margin-top:18px}
     .card{
-      background:linear-gradient(180deg,var(--glass),var(--glass2));
-      border:1px solid var(--line);
-      box-shadow:var(--shadow);
-      border-radius:var(--radius);
-      padding:14px;
-      backdrop-filter: blur(14px);
+      background:linear-gradient(180deg,var(--glass),var(--glass2));border:1px solid var(--line);
+      box-shadow:var(--shadow);border-radius:var(--radius);padding:14px;backdrop-filter:blur(14px)
     }
-
-    #left,#right{
-      min-height:560px;
-    }
-
+    #left,#right{min-height:560px}
     #transcript{
-      min-height:190px;
-      max-height:360px;
-      overflow:auto;
-      border-radius:12px;
-      padding:12px;
-      background:rgba(255,255,255,.02);
-      border:1px solid rgba(255,255,255,.04);
+      min-height:190px;max-height:360px;overflow:auto;border-radius:12px;padding:12px;
+      background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)
     }
-
     #log{
-      height:280px;
-      overflow:auto;
-      border-radius:12px;
-      padding:10px;
-      background:rgba(255,255,255,.02);
-      border:1px solid rgba(255,255,255,.04);
-      color:var(--muted);
-      font-size:13px;
+      height:280px;overflow:auto;border-radius:12px;padding:10px;background:rgba(255,255,255,.02);
+      border:1px solid rgba(255,255,255,.04);color:var(--muted);font-size:13px
     }
-
-    .row{
-      display:flex;
-      gap:8px;
-      align-items:center;
-    }
-
-    .row.wrapline{
-      flex-wrap:wrap;
-    }
-
-    label{
-      font-size:13px;
-      color:var(--muted);
-    }
-
-    .hint{
-      font-size:12px;
-      color:var(--muted);
-      margin-top:8px;
-      line-height:1.45;
-    }
-
-    .muted{
-      color:var(--muted);
-    }
-
-    .kbd{
-      background:#071827;
-      padding:4px 8px;
-      border-radius:8px;
-      border:1px solid rgba(255,255,255,.08);
-      font-weight:700;
-    }
-
-    .command-list{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:8px;
-      margin-top:10px;
-    }
-
+    .row{display:flex;gap:8px;align-items:center}
+    .row.wrapline{flex-wrap:wrap}
+    label{font-size:13px;color:var(--muted)}
+    .hint{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.45}
+    .muted{color:var(--muted)}
+    .kbd{background:#071827;padding:4px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.08);font-weight:700}
+    .command-list{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
     .cmd{
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.04);
-      padding:10px;
-      border-radius:12px;
-      color:var(--muted);
-      font-size:13px;
-      cursor:pointer;
-      transition:.18s ease;
+      background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.04);padding:10px;border-radius:12px;
+      color:var(--muted);font-size:13px;cursor:pointer;transition:.18s ease
     }
-
-    .cmd:hover{
-      background:rgba(255,255,255,.05);
-      transform:translateY(-1px);
-    }
-
-    .utility-dock{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-      gap:10px;
-      margin:18px 0 8px;
-    }
-
+    .cmd:hover{background:rgba(255,255,255,.05);transform:translateY(-1px)}
+    .utility-dock{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:18px 0 8px}
     .util{
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.06);
-      color:var(--text);
-      padding:12px;
-      border-radius:14px;
-      text-align:center;
-      cursor:pointer;
-      transition:.18s ease;
+      background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);color:var(--text);
+      padding:12px;border-radius:14px;text-align:center;cursor:pointer;transition:.18s ease
     }
-
-    .util:hover{
-      transform:translateY(-2px);
-      background:rgba(255,255,255,.05);
-    }
-
-    .util small{
-      display:block;
-      color:#94a3b8;
-      font-size:12px;
-      margin-top:4px;
-    }
-
-    .voice-meter{
-      width:100%;
-      height:36px;
-      background:rgba(255,255,255,.02);
-      border-radius:10px;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.05);
-    }
-
-    .voice-meter>div{
-      height:100%;
-      width:0%;
-      background:linear-gradient(90deg,var(--accent),var(--accent2));
-      transition:width 100ms linear;
-    }
-
+    .util:hover{transform:translateY(-2px);background:rgba(255,255,255,.05)}
+    .util small{display:block;color:#94a3b8;font-size:12px;margin-top:4px}
+    .voice-meter{width:100%;height:36px;background:rgba(255,255,255,.02);border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.05)}
+    .voice-meter>div{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 100ms linear}
     .mem-list{
-      max-height:210px;
-      overflow:auto;
-      background:rgba(255,255,255,.02);
-      border:1px solid rgba(255,255,255,.05);
-      border-radius:12px;
-      padding:8px;
-      margin-top:8px;
+      max-height:210px;overflow:auto;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);
+      border-radius:12px;padding:8px;margin-top:8px
     }
-
-    hr{
-      border:none;
-      border-top:1px solid rgba(255,255,255,.06);
-      margin:14px 0;
-    }
-
-    .badge-line{
-      text-align:center;
-      color:#94a3b8;
-      font-size:12px;
-      margin:4px 0 12px;
-    }
-
-    footer{
-      text-align:center;
-      color:var(--muted);
-      font-size:13px;
-      margin:18px 0 8px;
-    }
-
-    .overlay{
-      position:fixed;
-      inset:0;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index:9999;
-      color:#fff;
-    }
-
-    #powerOverlay{
-      background:rgba(0,0,0,.98);
-      flex-direction:column;
-      gap:18px;
-    }
-
-    #powerSpinner{
-      width:64px;
-      height:64px;
-      border-radius:50%;
-      border:6px solid rgba(255,255,255,.12);
-      border-top-color:#fff;
-      animation:spin 1s linear infinite;
-    }
-
-    @keyframes spin{
-      to{transform:rotate(360deg)}
-    }
-
-    #flashlightOverlay{
-      background:#fff;
-      display:none;
-    }
-
-    #lockOverlay{
-      background:rgba(0,0,0,.92);
-      color:#fff;
-      flex-direction:column;
-      gap:12px;
-      text-align:center;
-    }
-
-    #cameraOverlay{
-      background:rgba(0,0,0,.94);
-      color:#fff;
-      flex-direction:column;
-      gap:10px;
-    }
-
+    hr{border:none;border-top:1px solid rgba(255,255,255,.06);margin:14px 0}
+    .badge-line{text-align:center;color:#94a3b8;font-size:12px;margin:4px 0 12px}
+    footer{text-align:center;color:var(--muted);font-size:13px;margin:18px 0 8px}
+    .overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:9999;color:#fff}
+    #powerOverlay{background:rgba(0,0,0,.98);flex-direction:column;gap:18px}
+    #powerSpinner{width:64px;height:64px;border-radius:50%;border:6px solid rgba(255,255,255,.12);border-top-color:#fff;animation:spin 1s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    #flashlightOverlay{background:#fff;display:none}
+    #lockOverlay{background:rgba(0,0,0,.92);color:#fff;flex-direction:column;gap:12px;text-align:center}
+    #cameraOverlay{background:rgba(0,0,0,.94);color:#fff;flex-direction:column;gap:10px}
     .overlayTopBar{
-      position:fixed;
-      top:14px;
-      left:50%;
-      transform:translateX(-50%);
-      display:flex;
-      gap:8px;
-      align-items:center;
-      background:rgba(255,255,255,.05);
-      padding:8px 12px;
-      border:1px solid rgba(255,255,255,.1);
-      border-radius:999px;
-      z-index:10000;
-      backdrop-filter: blur(12px);
+      position:fixed;top:14px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;
+      background:rgba(255,255,255,.05);padding:8px 12px;border:1px solid rgba(255,255,255,.1);border-radius:999px;z-index:10000;backdrop-filter:blur(12px)
     }
-
-    .overlayTopBar button{
-      background:transparent;
-      border:1px solid rgba(255,255,255,.16);
-      color:#fff;
-      border-radius:999px;
-    }
-
-    #cameraView{
-      width:min(92vw,960px);
-      height:min(70vh,520px);
-      background:#000;
-      border-radius:14px;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.08);
-    }
-
-    #cameraView video{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-    }
-
-    #boomCanvas{
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      z-index:11000;
-      display:none;
-    }
-
-    #facePreview img{
-      max-width:120px;
-      border-radius:10px;
-      border:1px solid rgba(255,255,255,.08);
-    }
-
+    .overlayTopBar button{background:transparent;border:1px solid rgba(255,255,255,.16);color:#fff;border-radius:999px}
+    #cameraView{width:min(92vw,960px);height:min(70vh,520px);background:#000;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.08)}
+    #cameraView video{width:100%;height:100%;object-fit:cover}
+    #boomCanvas{position:fixed;inset:0;pointer-events:none;z-index:11000;display:none}
+    #facePreview img{max-width:120px;border-radius:10px;border:1px solid rgba(255,255,255,.08)}
     .notice{
-      font-size:12px;
-      color:#b8c5d3;
-      line-height:1.45;
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.05);
-      padding:10px 12px;
-      border-radius:12px;
-      margin-top:10px;
+      font-size:12px;color:#b8c5d3;line-height:1.45;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);
+      padding:10px 12px;border-radius:12px;margin-top:10px
     }
-
     .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding:7px 10px;
-      border-radius:999px;
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.05);
-      font-size:12px;
-      color:#b8c7d8;
+      display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.05);font-size:12px;color:#b8c7d8
     }
-
-    @media (max-width:980px){
-      .panel{
-        grid-template-columns:1fr;
-      }
-      #right{
-        order:2;
-      }
+    #jarvisOrb{
+      position:fixed;right:18px;bottom:18px;width:68px;height:68px;border-radius:50%;
+      background:radial-gradient(circle at 35% 35%, rgba(255,255,255,.7), transparent 18%),
+                 radial-gradient(circle at center, rgba(34,197,94,.28), rgba(255,106,0,.18), rgba(0,0,0,.4));
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 0 28px rgba(255,106,0,.25),0 0 38px rgba(34,197,94,.18),inset 0 0 18px rgba(255,255,255,.08);
+      z-index:9998;animation:orbFloat 3s ease-in-out infinite;cursor:pointer;backdrop-filter:blur(10px)
     }
-
+    @keyframes orbFloat{
+      0%,100%{transform:translateY(0px) scale(1)}
+      50%{transform:translateY(-6px) scale(1.03)}
+    }
+    body.light-mode{
+      --bg:#edf4fb;--bg2:#dce9f7;--card:#ffffff;--card2:#f4f8fd;--muted:#516272;--glass:rgba(255,255,255,.72);
+      --glass2:rgba(255,255,255,.56);--line:rgba(0,0,0,.08);--text:#112233;color:var(--text)
+    }
+    .chip{
+      display:inline-block;padding:8px 10px;border-radius:999px;margin:4px 6px 0 0;background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.07);font-size:12px;color:#cfe1ef;cursor:pointer
+    }
+    body.light-mode .chip{color:#203040;background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.08)}
+    @media (max-width:980px){.panel{grid-template-columns:1fr}#right{order:2}}
     @media (max-width:640px){
-      .wrap{
-        padding:14px;
-      }
-      .command-list{
-        grid-template-columns:1fr;
-      }
-      .controls{
-        gap:7px;
-      }
-      button,input,select{
-        width:100%;
-      }
-      .row.responsive{
-        flex-wrap:wrap;
-      }
+      .wrap{padding:14px}.command-list{grid-template-columns:1fr}.controls{gap:7px}
+      button,input,select{width:100%}.row.responsive{flex-wrap:wrap}
     }
   </style>
 </head>
@@ -489,43 +162,46 @@
     <header>
       <div class="brand">
         <h1>Jarvis — Web Voice Assistant</h1>
-        <div class="subtitle">
-          Single-file monster build. Fully client-side. Best in Chrome/Edge.
-        </div>
+        <div class="subtitle">Phase 2 monster build. Client-side PWA. Voice fix + boot UI + theme + history + install banner.</div>
       </div>
-
       <div class="top-status">
         <div class="status" id="listenStatusWrap">
           <span class="dot" id="listenDot"></span>
           <span id="listenStatus">Idle</span>
         </div>
         <div style="height:8px"></div>
-        <div class="muted" style="font-size:12px">
-          Language: <span id="langLabel">English (en-US)</span>
-        </div>
+        <div class="muted" style="font-size:12px">Language: <span id="langLabel">English (en-US)</span></div>
       </div>
     </header>
+
+    <div id="installBanner" class="card" style="display:none; margin-top:12px; padding:12px;">
+      <div class="row wrapline" style="justify-content:space-between;">
+        <div>
+          <strong>Install Jarvis</strong>
+          <div class="hint">Add this app to your home screen for a cleaner app-like experience.</div>
+        </div>
+        <div class="row wrapline">
+          <button id="btnInstallApp" class="smallbtn">Install</button>
+          <button id="btnDismissInstall" class="smallbtn">Dismiss</button>
+        </div>
+      </div>
+    </div>
 
     <div class="controls">
       <button id="btnStart" class="primary">Start Listening</button>
       <button id="btnStop">Stop</button>
       <button id="btnWake">Wake-word: <span id="wakeState">Off</span></button>
-
       <label style="margin-left:6px;color:var(--muted)">Custom wake:</label>
       <input id="wakeInput" type="text" placeholder="e.g. Oye Jarvis" style="width:170px" />
       <button id="btnSaveWake" class="smallbtn">Save</button>
-
       <button id="btnToggleVoice">Toggle Voice Reply</button>
       <button id="btnClearLog" class="smallbtn">Clear Log</button>
-
       <select id="langSelect">
         <option value="en-US">English (en-US)</option>
         <option value="hi-IN">Hindi (hi-IN)</option>
       </select>
-
       <label style="margin-left:8px;color:var(--muted)">Voice:</label>
       <select id="voiceSelect"></select>
-
       <button id="btnSaveMemory" title="Save memory">💾 Save Memory</button>
       <button id="btnShowMemory" title="Show memories">🗂️ Memories</button>
     </div>
@@ -538,15 +214,21 @@
       <span class="pill">Camera</span>
       <span class="pill">Wiki</span>
       <span class="pill">Memory</span>
+      <span class="pill">Theme Switch</span>
     </div>
 
     <div class="panel">
       <div id="left" class="card">
-        <h3>Say or type a command</h3>
-
-        <div id="transcript">
-          Press <span class="kbd">Start Listening</span> and speak — or type below.
+        <div id="bootPanel" class="card" style="margin-bottom:12px; padding:12px;">
+          <div style="font-weight:800; letter-spacing:2px;">JARVIS SYSTEM BOOT</div>
+          <div id="bootText" class="hint" style="margin-top:8px;">Initializing systems...</div>
+          <div style="margin-top:10px; height:10px; background:rgba(255,255,255,.05); border-radius:999px; overflow:hidden;">
+            <div id="bootBar" style="height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--accent2)); transition:width .25s ease;"></div>
+          </div>
         </div>
+
+        <h3>Say or type a command</h3>
+        <div id="transcript">Press <span class="kbd">Start Listening</span> and speak — or type below.</div>
 
         <div style="margin-top:12px" class="row responsive">
           <input id="cmdInput" type="text" placeholder="e.g. open youtube / what is the time / search cats" />
@@ -624,21 +306,31 @@
         <div id="log"></div>
 
         <h4 style="margin-top:12px">Settings</h4>
-
         <div class="row" style="margin-top:6px">
           <label>Voice reply:</label>
           <input type="checkbox" id="chkVoice" checked />
         </div>
-
         <div class="row" style="margin-top:6px">
           <label>Continuous listen:</label>
           <input type="checkbox" id="chkContinuous" />
         </div>
-
         <div class="row" style="margin-top:6px">
           <label>Wake-word required:</label>
           <input type="checkbox" id="chkWakeReq" />
         </div>
+
+        <h4 style="margin-top:12px">Theme / Extras</h4>
+        <div class="row wrapline" style="margin-top:8px">
+          <button id="btnThemeToggle" class="smallbtn">Toggle Theme</button>
+          <button id="btnVoiceTest" class="smallbtn">Test Voice</button>
+          <button id="btnClearMemories" class="smallbtn">Clear Memories</button>
+        </div>
+
+        <h4 style="margin-top:12px">Recent Commands</h4>
+        <div id="recentCommands" class="mem-list"></div>
+
+        <h4 style="margin-top:12px">Jarvis Stats</h4>
+        <div id="statsBox" class="mem-list"></div>
 
         <h4 style="margin-top:12px">Memories</h4>
         <div style="display:flex; gap:8px; margin-top:6px;">
@@ -647,9 +339,7 @@
         </div>
         <div class="mem-list" id="memList"></div>
 
-        <div style="margin-top:10px" class="muted">
-          Supported best in Chrome/Edge. Safari support is limited.
-        </div>
+        <div style="margin-top:10px" class="muted">Supported best in Chrome/Edge. Safari support is limited.</div>
       </div>
     </div>
 
@@ -671,13 +361,9 @@
       <div class="util" data-cmd="unlock screen">Unlock Screen</div>
     </div>
 
-    <div class="badge-line">
-      Features: speech, wake phrase, PWA, memories, wiki, screenshot, camera, games, quotes, timer, weather, news
-    </div>
+    <div class="badge-line">Features: speech, wake phrase, PWA, memories, wiki, screenshot, camera, games, quotes, timer, weather, news</div>
 
-    <footer>
-      Built for you — say hi and try commands. DEVELOPED BY RUDRANSH PANDEY.
-    </footer>
+    <footer>Built for you — say hi and try commands. DEVELOPED BY RUDRANSH PANDEY.</footer>
   </div>
 
   <div id="powerOverlay" class="overlay">
@@ -700,12 +386,11 @@
       <button id="btnSwitchCamera">Switch</button>
       <button id="btnCameraSnap">Snap</button>
     </div>
-    <div id="cameraView">
-      <video id="camVideo" autoplay playsinline muted></video>
-    </div>
+    <div id="cameraView"><video id="camVideo" autoplay playsinline muted></video></div>
   </div>
 
   <canvas id="boomCanvas"></canvas>
+  <div id="jarvisOrb" title="Jarvis Orb"></div>
 
   <script>
     if ("serviceWorker" in navigator) {
@@ -773,6 +458,19 @@
       const memAdd = document.getElementById("memAdd");
       const memList = document.getElementById("memList");
 
+      const installBanner = document.getElementById("installBanner");
+      const btnInstallApp = document.getElementById("btnInstallApp");
+      const btnDismissInstall = document.getElementById("btnDismissInstall");
+      const btnThemeToggle = document.getElementById("btnThemeToggle");
+      const btnVoiceTest = document.getElementById("btnVoiceTest");
+      const btnClearMemories = document.getElementById("btnClearMemories");
+      const recentCommands = document.getElementById("recentCommands");
+      const statsBox = document.getElementById("statsBox");
+      const bootPanel = document.getElementById("bootPanel");
+      const bootText = document.getElementById("bootText");
+      const bootBar = document.getElementById("bootBar");
+      const jarvisOrb = document.getElementById("jarvisOrb");
+
       let recognition = null;
       let listening = false;
       let manuallyStopped = false;
@@ -788,6 +486,9 @@
       let faceDataUrl = localStorage.getItem("jarvis_face") || null;
       let customWake = (localStorage.getItem("jarvis_wake") || "hey jarvis").trim().toLowerCase();
       let wakeLock = null;
+      let deferredPrompt = null;
+      let commandHistory = loadJson("jarvis_command_history", []);
+      let stats = loadJson("jarvis_stats", { commandsRun: 0, searches: 0, screenshots: 0, memoriesSaved: 0, jokesTold: 0 });
 
       const jokes = [
         "Why did the developer go broke? Because he used up all his cache.",
@@ -802,13 +503,7 @@
       ];
 
       function escapeHtml(s) {
-        return String(s).replace(/[&<>"']/g, m => ({
-          "&":"&amp;",
-          "<":"&lt;",
-          ">":"&gt;",
-          '"':"&quot;",
-          "'":"&#39;"
-        }[m]));
+        return String(s).replace(/[&<>"']/g, m => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[m]));
       }
 
       function escapeRegex(str) {
@@ -858,18 +553,33 @@
         }
       }
 
-      function getMemories() {
-        return loadJson("jarvis_mems", []);
-      }
+      function getMemories() { return loadJson("jarvis_mems", []); }
+      function setMemories(items) { saveJson("jarvis_mems", items); }
 
-      function setMemories(items) {
-        saveJson("jarvis_mems", items);
+      function unlockSpeech() {
+        try {
+          const u = new SpeechSynthesisUtterance(" ");
+          u.volume = 0;
+          synth.speak(u);
+          synth.cancel();
+          log("Speech engine unlocked");
+        } catch (e) {
+          log("Speech unlock failed: " + e.message, "err");
+        }
       }
 
       function populateVoices() {
         if (!synth) return;
         availableVoices = synth.getVoices() || [];
         voiceSelect.innerHTML = "";
+
+        if (!availableVoices.length) {
+          const opt = document.createElement("option");
+          opt.value = "";
+          opt.textContent = "Default browser voice";
+          voiceSelect.appendChild(opt);
+          return;
+        }
 
         availableVoices.forEach((voice, i) => {
           const opt = document.createElement("option");
@@ -881,6 +591,11 @@
         const saved = localStorage.getItem("jarvis_voice_index");
         if (saved && availableVoices[Number(saved)]) {
           voiceSelect.value = saved;
+        } else {
+          const englishIndex = availableVoices.findIndex(v => /en/i.test(v.lang));
+          const hindiIndex = availableVoices.findIndex(v => /hi/i.test(v.lang));
+          if (lang === "hi-IN" && hindiIndex >= 0) voiceSelect.value = String(hindiIndex);
+          else if (englishIndex >= 0) voiceSelect.value = String(englishIndex);
         }
       }
 
@@ -892,27 +607,142 @@
       }
 
       function speak(text, opts = {}) {
-        if (!chkVoice.checked || !synth) return;
+        if (!chkVoice.checked) return;
+        if (!synth) {
+          log("Speech synthesis not supported", "err");
+          return;
+        }
 
         try {
+          synth.cancel();
           const utter = new SpeechSynthesisUtterance(text);
-          utter.lang = opts.lang || lang;
+          utter.lang = opts.lang || lang || "en-US";
           utter.rate = opts.rate || 1;
           utter.pitch = opts.pitch || 1;
+          utter.volume = 1;
 
-          const picked = availableVoices[Number(voiceSelect.value)];
-          if (picked) utter.voice = picked;
+          const selectedIndex = Number(voiceSelect.value);
+          if (!Number.isNaN(selectedIndex) && availableVoices[selectedIndex]) {
+            utter.voice = availableVoices[selectedIndex];
+            utter.lang = availableVoices[selectedIndex].lang || utter.lang;
+          } else {
+            const fallback =
+              availableVoices.find(v => utter.lang.toLowerCase().startsWith(v.lang.toLowerCase().split("-")[0])) ||
+              availableVoices.find(v => /en/i.test(v.lang)) ||
+              availableVoices[0];
 
-          synth.cancel();
+            if (fallback) {
+              utter.voice = fallback;
+              utter.lang = fallback.lang || utter.lang;
+            }
+          }
+
+          utter.onstart = () => log("Voice reply started");
+          utter.onend = () => log("Voice reply finished");
+          utter.onerror = e => log("Voice reply error: " + (e.error || "unknown"), "err");
+
           synth.speak(utter);
           log("Jarvis: " + text);
         } catch (err) {
-          console.warn("Speech synthesis failed", err);
+          log("Speech synthesis failed: " + err.message, "err");
         }
       }
 
-      function normalizeCommand(text) {
-        return text.trim();
+      function normalizeCommand(text) { return text.trim(); }
+
+      function pushCommandHistory(cmd) {
+        commandHistory.unshift(cmd);
+        commandHistory = commandHistory.slice(0, 12);
+        saveJson("jarvis_command_history", commandHistory);
+        renderRecentCommands();
+      }
+
+      function renderRecentCommands() {
+        recentCommands.innerHTML = "";
+        if (!commandHistory.length) {
+          recentCommands.textContent = "No recent commands";
+          return;
+        }
+        commandHistory.forEach(cmd => {
+          const chip = document.createElement("span");
+          chip.className = "chip";
+          chip.textContent = cmd;
+          chip.addEventListener("click", () => {
+            cmdInput.value = cmd;
+            runCommandPipeline(cmd);
+          });
+          recentCommands.appendChild(chip);
+        });
+      }
+
+      function renderStats() {
+        statsBox.innerHTML = `
+          <div><strong>Commands run:</strong> ${stats.commandsRun}</div>
+          <div style="margin-top:6px"><strong>Searches:</strong> ${stats.searches}</div>
+          <div style="margin-top:6px"><strong>Screenshots:</strong> ${stats.screenshots}</div>
+          <div style="margin-top:6px"><strong>Memories saved:</strong> ${stats.memoriesSaved}</div>
+          <div style="margin-top:6px"><strong>Jokes told:</strong> ${stats.jokesTold}</div>
+        `;
+      }
+
+      function saveStats() {
+        saveJson("jarvis_stats", stats);
+        renderStats();
+      }
+
+      function runBootSequence() {
+        const steps = [
+          "Initializing core systems...",
+          "Loading voice engine...",
+          "Calibrating microphone...",
+          "Mounting interface...",
+          "Starting Jarvis services...",
+          "System ready."
+        ];
+
+        let i = 0;
+        bootBar.style.width = "0%";
+        bootText.textContent = steps[0];
+
+        const id = setInterval(() => {
+          i++;
+          const pct = Math.min(100, Math.round((i / steps.length) * 100));
+          bootBar.style.width = pct + "%";
+          bootText.textContent = steps[Math.min(i, steps.length - 1)];
+
+          if (i >= steps.length) {
+            clearInterval(id);
+            setTimeout(() => { bootPanel.style.display = "none"; }, 700);
+          }
+        }, 450);
+      }
+
+      function applySavedTheme() {
+        const mode = localStorage.getItem("jarvis_theme") || "dark";
+        document.body.classList.toggle("light-mode", mode === "light");
+      }
+
+      function toggleTheme() {
+        const isLight = document.body.classList.toggle("light-mode");
+        localStorage.setItem("jarvis_theme", isLight ? "light" : "dark");
+        log("Theme set to " + (isLight ? "light" : "dark"));
+      }
+
+      function normalizeHindiAliases(text) {
+        const map = [
+          [/samay|time batao|kitna baje/i, "time"],
+          [/date batao|aaj ki date/i, "date"],
+          [/youtube kholo|open youtube/i, "open youtube"],
+          [/google kholo|open google/i, "open google"],
+          [/mausam|weather/i, "weather"],
+          [/news kholo|khabar/i, "news"],
+          [/joke suna/i, "joke"],
+          [/camera kholo/i, "open camera"]
+        ];
+        for (const [pattern, replacement] of map) {
+          if (pattern.test(text)) return replacement;
+        }
+        return text;
       }
 
       function setupRecognition() {
@@ -944,9 +774,7 @@
           log("Voice recognition stopped");
 
           if (chkContinuous.checked && recognition && !manuallyStopped) {
-            setTimeout(() => {
-              try { recognition.start(); } catch {}
-            }, 250);
+            setTimeout(() => { try { recognition.start(); } catch {} }, 250);
           }
         };
 
@@ -986,8 +814,15 @@
       }
 
       function runCommandPipeline(text) {
-        const cleaned = normalizeCommand(text);
+        let cleaned = normalizeCommand(text);
         if (!cleaned) return;
+
+        cleaned = normalizeHindiAliases(cleaned);
+
+        stats.commandsRun++;
+        saveStats();
+        pushCommandHistory(cleaned);
+
         if (handleExtraCommand(cleaned)) return;
         handleCommand(cleaned);
       }
@@ -995,7 +830,6 @@
       async function handleCommand(textRaw) {
         const text = textRaw.trim();
         if (!text) return;
-
         const lower = text.toLowerCase();
 
         if (/^(hi|hello|hey|hey jarvis|ok jarvis)\b/.test(lower)) {
@@ -1034,10 +868,8 @@
 
         if (lower.startsWith("search ") || lower.startsWith("google ")) {
           const q = text.replace(/^(search|google)\s+/i, "").trim();
-          if (!q) {
-            speak("What do you want me to search?");
-            return;
-          }
+          if (!q) { speak("What do you want me to search?"); return; }
+          stats.searches++; saveStats();
           speak("Searching Google for " + q);
           openUrl("https://www.google.com/search?q=" + encodeURIComponent(q));
           addTranscriptEntry("Jarvis: searched for " + q);
@@ -1046,28 +878,16 @@
 
         if (lower.startsWith("wiki ") || lower.startsWith("wikipedia ")) {
           const term = text.replace(/^(wiki|wikipedia)\s+/i, "").trim();
-          if (!term) {
-            speak("What do you want from Wikipedia?");
-            return;
-          }
-
+          if (!term) { speak("What do you want from Wikipedia?"); return; }
           speak("Searching Wikipedia for " + term);
           addTranscriptEntry("Jarvis: fetching Wikipedia for " + term);
 
           try {
             const api = "https://en.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(term);
             const r = await fetch(api);
-
-            if (!r.ok) {
-              speak("No Wikipedia page found for " + term);
-              return;
-            }
-
+            if (!r.ok) { speak("No Wikipedia page found for " + term); return; }
             const j = await r.json();
-            const extract = j.extract
-              ? j.extract.split(". ").slice(0, 2).join(". ") + "."
-              : "No summary available.";
-
+            const extract = j.extract ? j.extract.split(". ").slice(0, 2).join(". ") + "." : "No summary available.";
             speak(extract);
             addTranscriptEntry("Wiki: " + extract);
           } catch (e) {
@@ -1077,20 +897,9 @@
           return;
         }
 
-        if (
-          lower.startsWith("calculate ") ||
-          lower.startsWith("what is ") ||
-          /^[0-9+\-*/(). %]+$/.test(lower)
-        ) {
-          const expr = text
-            .replace(/^(calculate|what is)\s+/i, "")
-            .replace(/[^0-9+\-*/(). %]/g, "");
-
-          if (!expr) {
-            speak("I could not parse the expression");
-            return;
-          }
-
+        if (lower.startsWith("calculate ") || lower.startsWith("what is ") || /^[0-9+\-*/(). %]+$/.test(lower)) {
+          const expr = text.replace(/^(calculate|what is)\s+/i, "").replace(/[^0-9+\-*/(). %]/g, "");
+          if (!expr) { speak("I could not parse the expression"); return; }
           try {
             const val = Function(`"use strict"; return (${expr})`)();
             speak("The result is " + val);
@@ -1104,18 +913,12 @@
 
         if (lower.startsWith("set timer") || lower.startsWith("timer ")) {
           const m = lower.match(/(\d+)\s*(seconds|second|minutes|minute|secs|mins)?/);
-          if (!m) {
-            speak("Please tell me the time in seconds or minutes");
-            return;
-          }
-
+          if (!m) { speak("Please tell me the time in seconds or minutes"); return; }
           const num = parseInt(m[1], 10);
           const unit = (m[2] || "seconds").toLowerCase();
           const ms = unit.startsWith("min") ? num * 60 * 1000 : num * 1000;
-
           speak(`Timer set for ${num} ${unit.startsWith("min") ? "minutes" : "seconds"}`);
           addTranscriptEntry(`Timer: ${num} ${unit}`);
-
           setTimeout(() => {
             speak(`Timer finished: ${num} ${unit.startsWith("min") ? "minutes" : "seconds"}`);
             alert(`Timer finished: ${num} ${unit}`);
@@ -1131,6 +934,7 @@
 
         if (lower.includes("joke")) {
           const joke = jokes[Math.floor(Math.random() * jokes.length)];
+          stats.jokesTold++; saveStats();
           speak(joke);
           addTranscriptEntry("Joke: " + joke);
           return;
@@ -1146,7 +950,6 @@
         if (lower.includes("weather")) {
           const m = text.match(/weather in (.+)$/i);
           const place = m ? m[1].trim() : "";
-
           if (place) {
             speak("Opening weather for " + place);
             openUrl("https://wttr.in/" + encodeURIComponent(place));
@@ -1159,18 +962,11 @@
 
         if (lower.startsWith("translate ")) {
           const m = text.match(/^translate\s+(.+?)\s+to\s+([a-zA-Z\-]+)/i);
-
           if (m) {
             const phrase = m[1];
             const target = m[2];
             speak("Translating to " + target);
-            openUrl(
-              "https://translate.google.com/?sl=auto&tl=" +
-              encodeURIComponent(target) +
-              "&text=" +
-              encodeURIComponent(phrase) +
-              "&op=translate"
-            );
+            openUrl("https://translate.google.com/?sl=auto&tl=" + encodeURIComponent(target) + "&text=" + encodeURIComponent(phrase) + "&op=translate");
           } else {
             speak("Opening Google Translate");
             openUrl("https://translate.google.com");
@@ -1184,6 +980,7 @@
             const mems = getMemories();
             mems.push({ text: mem, time: Date.now() });
             setMemories(mems);
+            stats.memoriesSaved++; saveStats();
             speak("Done. I will remember: " + mem);
             addTranscriptEntry("Memory saved: " + mem);
             renderMemories();
@@ -1193,16 +990,9 @@
           return;
         }
 
-        if (
-          lower.includes("what do you remember") ||
-          lower.includes("list memories") ||
-          lower.includes("what did i ask you to remember")
-        ) {
+        if (lower.includes("what do you remember") || lower.includes("list memories") || lower.includes("what did i ask you to remember")) {
           const mems = getMemories();
-          if (mems.length === 0) {
-            speak("You have no saved memories.");
-            return;
-          }
+          if (mems.length === 0) { speak("You have no saved memories."); return; }
           speak(`You asked me to remember ${mems.length} items. I will show them now.`);
           renderMemories();
           showMemories();
@@ -1214,103 +1004,36 @@
           return;
         }
 
-        if (lower.includes("power off") || lower.includes("shutdown")) {
-          powerOffAnimation();
-          return;
-        }
-
-        if (lower.includes("restart")) {
-          restartAnimation();
-          return;
-        }
-
-        if (lower.includes("flashlight on") || lower.includes("torch on")) {
-          flashlight(true);
-          return;
-        }
-
-        if (lower.includes("flashlight off") || lower.includes("torch off")) {
-          flashlight(false);
-          return;
-        }
-
-        if (lower.includes("open camera") || lower.includes("show camera")) {
-          openCamera();
-          return;
-        }
-
-        if (lower.includes("close camera") || lower.includes("hide camera")) {
-          closeCamera();
-          return;
-        }
+        if (lower.includes("power off") || lower.includes("shutdown")) { powerOffAnimation(); return; }
+        if (lower.includes("restart")) { restartAnimation(); return; }
+        if (lower.includes("flashlight on") || lower.includes("torch on")) { flashlight(true); return; }
+        if (lower.includes("flashlight off") || lower.includes("torch off")) { flashlight(false); return; }
+        if (lower.includes("open camera") || lower.includes("show camera")) { openCamera(); return; }
+        if (lower.includes("close camera") || lower.includes("hide camera")) { closeCamera(); return; }
 
         if (lower.includes("youtube")) {
-          const song = text
-            .replace(/play/i, "")
-            .replace(/on youtube/i, "")
-            .replace(/youtube/i, "")
-            .trim();
-
-          if (!song) {
-            speak("Please tell song name");
-          } else {
+          const song = text.replace(/play/i, "").replace(/on youtube/i, "").replace(/youtube/i, "").trim();
+          if (!song) speak("Please tell song name");
+          else {
             openUrl("https://www.youtube.com/results?search_query=" + encodeURIComponent(song));
             speak("Opening YouTube for " + song);
           }
           return;
         }
 
-        if (lower.includes("whatsapp")) {
-          openWhatsApp();
-          speak("Opening WhatsApp");
-          return;
-        }
-
-        if (lower.includes("gallery")) {
-          openGallery();
-          return;
-        }
-
-        if (lower.includes("keep screen on") || lower.includes("stay awake")) {
-          keepScreenOn();
-          return;
-        }
-
-        if (lower.includes("allow sleep")) {
-          allowSleep();
-          return;
-        }
-
-        if (lower.includes("vibrate")) {
-          vibrate();
-          return;
-        }
-
-        if (lower.includes("lock screen")) {
-          lockScreen();
-          return;
-        }
-
-        if (lower.includes("unlock screen")) {
-          unlockScreen();
-          return;
-        }
-
-        if (lower.includes("news") || lower.includes("top news")) {
-          openNews();
-          return;
-        }
+        if (lower.includes("whatsapp")) { openWhatsApp(); speak("Opening WhatsApp"); return; }
+        if (lower.includes("gallery")) { openGallery(); return; }
+        if (lower.includes("keep screen on") || lower.includes("stay awake")) { keepScreenOn(); return; }
+        if (lower.includes("allow sleep")) { allowSleep(); return; }
+        if (lower.includes("vibrate")) { vibrate(); return; }
+        if (lower.includes("lock screen")) { lockScreen(); return; }
+        if (lower.includes("unlock screen")) { unlockScreen(); return; }
+        if (lower.includes("news") || lower.includes("top news")) { openNews(); return; }
 
         if (lower.includes("spotify")) {
-          const song = text
-            .replace(/play/i, "")
-            .replace(/on spotify/i, "")
-            .replace(/spotify/i, "")
-            .trim();
-
-          if (!song) {
-            speak("Please tell song name");
-          } else {
+          const song = text.replace(/play/i, "").replace(/on spotify/i, "").replace(/spotify/i, "").trim();
+          if (!song) speak("Please tell song name");
+          else {
             openUrl("https://open.spotify.com/search/" + encodeURIComponent(song));
             speak("Playing " + song + " on Spotify");
           }
@@ -1319,24 +1042,21 @@
 
         if (lower.includes("physics wallah") || lower.includes("open pw") || lower.includes("play pw")) {
           speak("Opening Physics Wallah");
-          try {
-            window.location.href = "intent://#Intent;package=in.eduwall.pwclassroom;scheme=pw;end";
-          } catch {}
+          try { window.location.href = "intent://#Intent;package=in.eduwall.pwclassroom;scheme=pw;end"; } catch {}
           setTimeout(() => openUrl("https://www.pw.live/"), 800);
           return;
         }
 
         speak("I did not understand. Do you want me to search the web?");
         if (confirm(`Search web for "${text}"?`)) {
+          stats.searches++; saveStats();
           openUrl("https://www.google.com/search?q=" + encodeURIComponent(text));
         }
       }
 
       function stopListening() {
         manuallyStopped = true;
-        if (recognition) {
-          try { recognition.stop(); } catch {}
-        }
+        if (recognition) { try { recognition.stop(); } catch {} }
         listening = false;
         setListeningUI(false);
         stopVoiceMeter();
@@ -1346,11 +1066,7 @@
       function renderMemories() {
         const mems = getMemories();
         memList.innerHTML = "";
-
-        if (mems.length === 0) {
-          memList.textContent = "No memories saved";
-          return;
-        }
+        if (mems.length === 0) { memList.textContent = "No memories saved"; return; }
 
         mems.slice().reverse().forEach((m, i) => {
           const card = document.createElement("div");
@@ -1359,9 +1075,7 @@
           card.innerHTML = `
             <strong style="color:#9ae6b4">${new Date(m.time).toLocaleString()}</strong>
             <div style="margin-top:4px">${escapeHtml(m.text)}</div>
-            <div style="margin-top:6px">
-              <button class="mem-del smallbtn" data-i="${mems.length - 1 - i}">Delete</button>
-            </div>
+            <div style="margin-top:6px"><button class="mem-del smallbtn" data-i="${mems.length - 1 - i}">Delete</button></div>
           `;
           memList.appendChild(card);
         });
@@ -1386,17 +1100,11 @@
       async function openCamera() {
         try {
           cameraOverlay.style.display = "flex";
-
-          if (camStream) {
-            camStream.getTracks().forEach(t => t.stop());
-            camStream = null;
-          }
-
+          if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
           camStream = await navigator.mediaDevices.getUserMedia({
             video: { facingMode: usingBackCam ? { ideal: "environment" } : "user" },
             audio: false
           });
-
           camVideo.srcObject = camStream;
           log("Camera opened");
         } catch (e) {
@@ -1407,10 +1115,7 @@
 
       function closeCamera() {
         cameraOverlay.style.display = "none";
-        if (camStream) {
-          camStream.getTracks().forEach(t => t.stop());
-          camStream = null;
-        }
+        if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
         log("Camera closed");
       }
 
@@ -1422,15 +1127,10 @@
 
       async function batteryStatus() {
         try {
-          if (!("getBattery" in navigator)) {
-            alert("Battery API not supported");
-            return;
-          }
-
+          if (!("getBattery" in navigator)) { alert("Battery API not supported"); return; }
           const b = await navigator.getBattery();
           const pct = Math.round(b.level * 100);
           const charging = b.charging ? "charging" : "not charging";
-
           alert(`Battery: ${pct}% (${charging})`);
           log(`Battery status: ${pct}% (${charging})`);
         } catch (e) {
@@ -1439,10 +1139,7 @@
       }
 
       function deviceInfo() {
-        const info =
-          `UA: ${navigator.userAgent}\n` +
-          `Platform: ${navigator.platform}\n` +
-          `Language: ${navigator.language}`;
+        const info = `UA: ${navigator.userAgent}\nPlatform: ${navigator.platform}\nLanguage: ${navigator.language}`;
         alert(info);
         log("Device info shown");
       }
@@ -1452,12 +1149,9 @@
           if ("wakeLock" in navigator) {
             wakeLock = await navigator.wakeLock.request("screen");
             log("Wake Lock active (screen on)");
-
             document.addEventListener("visibilitychange", async () => {
               if (document.visibilityState === "visible" && wakeLock == null) {
-                try {
-                  wakeLock = await navigator.wakeLock.request("screen");
-                } catch {}
+                try { wakeLock = await navigator.wakeLock.request("screen"); } catch {}
               }
             });
           } else {
@@ -1485,15 +1179,8 @@
         }
       }
 
-      function lockScreen() {
-        lockOverlay.style.display = "flex";
-        log("Screen locked (UI)");
-      }
-
-      function unlockScreen() {
-        lockOverlay.style.display = "none";
-        log("Screen unlocked (UI)");
-      }
+      function lockScreen() { lockOverlay.style.display = "flex"; log("Screen locked (UI)"); }
+      function unlockScreen() { lockOverlay.style.display = "none"; log("Screen unlocked (UI)"); }
 
       function openWhatsApp() {
         try {
@@ -1505,33 +1192,24 @@
         log("WhatsApp request");
       }
 
-      function openGallery() {
-        openUrl("https://photos.google.com");
-        log("Gallery opened");
-      }
+      function openGallery() { openUrl("https://photos.google.com"); log("Gallery opened"); }
 
       function powerOffAnimation() {
         powerOverlay.style.display = "flex";
         restartText.textContent = "Powering off...";
-        setTimeout(() => {
-          document.body.style.filter = "brightness(0)";
-        }, 600);
+        setTimeout(() => { document.body.style.filter = "brightness(0)"; }, 600);
         log("Simulated power off");
       }
 
       function restartAnimation() {
         powerOverlay.style.display = "flex";
         restartText.textContent = "Restarting...";
-        setTimeout(() => {
-          document.body.style.filter = "brightness(0)";
-        }, 600);
-
+        setTimeout(() => { document.body.style.filter = "brightness(0)"; }, 600);
         setTimeout(() => {
           document.body.style.filter = "";
           powerOverlay.style.display = "none";
           log("Simulated restart finished");
         }, 3200);
-
         log("Simulated restart");
       }
 
@@ -1549,15 +1227,9 @@
         if (typeof html2canvas === "undefined") {
           await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
         }
-
         try {
           speak("Taking screenshot");
-          const canvas = await html2canvas(document.documentElement, {
-            logging: false,
-            useCORS: true,
-            scale: 1
-          });
-
+          const canvas = await html2canvas(document.documentElement, { logging: false, useCORS: true, scale: 1 });
           const url = canvas.toDataURL("image/png");
           const a = document.createElement("a");
           a.href = url;
@@ -1565,6 +1237,7 @@
           document.body.appendChild(a);
           a.click();
           a.remove();
+          stats.screenshots++; saveStats();
           log("Screenshot taken and downloaded");
         } catch (e) {
           log("Screenshot failed: " + e.message, "err");
@@ -1572,20 +1245,13 @@
         }
       }
 
-      function openNews() {
-        speak("Opening top news");
-        openUrl("https://news.google.com/topstories?hl=en-US&gl=US&ceid=US:en");
-      }
+      function openNews() { speak("Opening top news"); openUrl("https://news.google.com/topstories?hl=en-US&gl=US&ceid=US:en"); }
 
       function runSelfDestruct() {
         const c = boomCanvas;
-        c.width = window.innerWidth;
-        c.height = window.innerHeight;
-        c.style.display = "block";
-
+        c.width = window.innerWidth; c.height = window.innerHeight; c.style.display = "block";
         const ctx = c.getContext("2d");
         const sparks = [];
-
         for (let i = 0; i < 220; i++) {
           sparks.push({
             x: window.innerWidth / 2 + (Math.random() - 0.5) * 200,
@@ -1601,29 +1267,18 @@
         let t = 0;
         speak("Self destruct in 3... 2... 1...");
         const originalTransform = document.body.style.transform || "";
-
         const id = setInterval(() => {
           ctx.fillStyle = "rgba(0,0,0,.12)";
           ctx.fillRect(0, 0, c.width, c.height);
-
           sparks.forEach(p => {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.vy += .18;
-            p.life--;
-
+            p.x += p.vx; p.y += p.vy; p.vy += .18; p.life--;
             ctx.beginPath();
             ctx.fillStyle = p.color + (p.life / 140) + ")";
             ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
             ctx.fill();
           });
-
           t++;
-          if (t % 6 === 0) {
-            document.body.style.transform =
-              `translate(${(Math.random() - .5) * 8}px, ${(Math.random() - .5) * 8}px)`;
-          }
-
+          if (t % 6 === 0) document.body.style.transform = `translate(${(Math.random() - .5) * 8}px, ${(Math.random() - .5) * 8}px)`;
           if (t > 160) {
             clearInterval(id);
             ctx.clearRect(0, 0, c.width, c.height);
@@ -1638,26 +1293,12 @@
         const choices = ["rock", "paper", "scissors"];
         const user = prompt("Choose rock, paper or scissors:");
         if (!user) return;
-
         const u = user.toLowerCase();
-        if (!choices.includes(u)) {
-          alert("Invalid choice");
-          return;
-        }
-
+        if (!choices.includes(u)) { alert("Invalid choice"); return; }
         const bot = choices[Math.floor(Math.random() * 3)];
         let res = "Draw";
-
-        if (
-          (u === "rock" && bot === "scissors") ||
-          (u === "paper" && bot === "rock") ||
-          (u === "scissors" && bot === "paper")
-        ) {
-          res = "You win!";
-        } else if (u !== bot) {
-          res = "You lose!";
-        }
-
+        if ((u === "rock" && bot === "scissors") || (u === "paper" && bot === "rock") || (u === "scissors" && bot === "paper")) res = "You win!";
+        else if (u !== bot) res = "You lose!";
         speak(`You chose ${u}. I chose ${bot}. ${res}`);
         alert(`You: ${u}\nJarvis: ${bot}\n\n${res}`);
       }
@@ -1666,19 +1307,12 @@
         const target = Math.floor(Math.random() * 50) + 1;
         let tries = 0;
         let ok = false;
-
         while (tries < 7) {
           const g = prompt("Guess the number (1-50). Attempts left: " + (7 - tries));
           if (g === null) return;
-
           const n = parseInt(g, 10);
-          if (Number.isNaN(n)) {
-            alert("Enter a number");
-            continue;
-          }
-
+          if (Number.isNaN(n)) { alert("Enter a number"); continue; }
           tries++;
-
           if (n === target) {
             speak("Correct!");
             alert("Correct! The number was " + target);
@@ -1692,7 +1326,6 @@
             alert("Lower");
           }
         }
-
         if (!ok) {
           speak("Out of attempts. The number was " + target);
           alert("Out of attempts. The number was " + target);
@@ -1715,30 +1348,25 @@
         const h = Math.min(a.height, b.height, 120);
 
         const ca = document.createElement("canvas");
-        ca.width = w;
-        ca.height = h;
+        ca.width = w; ca.height = h;
         const ctxA = ca.getContext("2d");
         ctxA.drawImage(a, 0, 0, w, h);
 
         const cb = document.createElement("canvas");
-        cb.width = w;
-        cb.height = h;
+        cb.width = w; cb.height = h;
         const ctxB = cb.getContext("2d");
         ctxB.drawImage(b, 0, 0, w, h);
 
         const da = ctxA.getImageData(0, 0, w, h).data;
         const db = ctxB.getImageData(0, 0, w, h).data;
 
-        let sum = 0;
-        let len = 0;
-
+        let sum = 0, len = 0;
         for (let i = 0; i < da.length; i += 4) {
           const la = 0.299 * da[i] + 0.587 * da[i + 1] + 0.114 * da[i + 2];
           const lb = 0.299 * db[i] + 0.587 * db[i + 1] + 0.114 * db[i + 2];
           sum += Math.abs(la - lb);
           len++;
         }
-
         return sum / (len * 255);
       }
 
@@ -1751,7 +1379,6 @@
 
       function handleExtraCommand(raw) {
         const lower = raw.toLowerCase().trim();
-
         if (/^(power\s*off( phone)?|shutdown( phone)?)$/.test(lower)) { powerOffAnimation(); return true; }
         if (/^(restart( phone)?|reboot( phone)?)$/.test(lower)) { restartAnimation(); return true; }
         if (/^(flashlight|torch) on$/.test(lower)) { flashlight(true); return true; }
@@ -1774,34 +1401,29 @@
         if (/^motivate$/.test(lower)) { speak(quotes[Math.floor(Math.random() * quotes.length)]); return true; }
         if (/^self destruct$/.test(lower)) { runSelfDestruct(); return true; }
         if (/^play music$/.test(lower)) { openUrl("https://www.youtube.com/results?search_query=lofi+beats"); return true; }
-
         if (/^remember /.test(lower)) {
           const mem = raw.replace(/^remember\s+/i, "").trim();
           if (mem) {
             const mems = getMemories();
             mems.push({ text: mem, time: Date.now() });
             setMemories(mems);
+            stats.memoriesSaved++; saveStats();
             renderMemories();
             speak("Memory saved");
           }
           return true;
         }
-
         if (lower.startsWith("open ") && (lower.includes("pw") || lower.includes("physics"))) {
           openUrl("https://www.pw.live/");
           return true;
         }
-
         return false;
       }
 
       async function startVoiceMeter() {
         try {
           if (!navigator.mediaDevices?.getUserMedia) return;
-
-          if (!audioContext) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-          }
+          if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
           meterSource = audioContext.createMediaStreamSource(stream);
@@ -1823,34 +1445,24 @@
           };
 
           meterAnimationId = requestAnimationFrame(loop);
-        } catch {
-          // ignore meter errors
-        }
+        } catch {}
       }
 
       function stopVoiceMeter() {
-        if (meterAnimationId) {
-          cancelAnimationFrame(meterAnimationId);
-          meterAnimationId = null;
-        }
-
+        if (meterAnimationId) { cancelAnimationFrame(meterAnimationId); meterAnimationId = null; }
         if (meterSource?.mediaStream) {
           meterSource.mediaStream.getTracks().forEach(t => t.stop());
           try { meterSource.disconnect(); } catch {}
         }
-
         if (analyser) {
           try { analyser.disconnect(); } catch {}
           analyser = null;
         }
-
         voiceMeterFill.style.width = "0%";
       }
 
       function init() {
-        transcriptEl.innerHTML =
-          'Press <span class="kbd">Start Listening</span> and speak — or type below.';
-
+        transcriptEl.innerHTML = 'Press <span class="kbd">Start Listening</span> and speak — or type below.';
         lang = langSelect.value;
         wakeInput.value = customWake;
 
@@ -1861,6 +1473,10 @@
 
         populateVoices();
         renderMemories();
+        renderRecentCommands();
+        renderStats();
+        applySavedTheme();
+        runBootSequence();
         setupRecognition();
         log("Jarvis ready");
 
@@ -1877,10 +1493,31 @@
             runCommandPipeline(cmd);
           });
         });
+
+        document.body.addEventListener("click", unlockSpeech, { once: true });
       }
+
+      window.addEventListener("beforeinstallprompt", e => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installBanner.style.display = "block";
+      });
+
+      btnInstallApp?.addEventListener("click", async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        installBanner.style.display = "none";
+      });
+
+      btnDismissInstall?.addEventListener("click", () => {
+        installBanner.style.display = "none";
+      });
 
       btnStart.addEventListener("click", () => {
         manuallyStopped = false;
+        unlockSpeech();
         if (!recognition) setupRecognition();
         if (recognition && !listening) {
           try { recognition.start(); } catch (e) { console.warn(e); }
@@ -1902,8 +1539,7 @@
 
       btnClearLog.addEventListener("click", () => {
         logEl.innerHTML = "";
-        transcriptEl.innerHTML =
-          'Press <span class="kbd">Start Listening</span> and speak — or type below.';
+        transcriptEl.innerHTML = 'Press <span class="kbd">Start Listening</span> and speak — or type below.';
       });
 
       chkContinuous.addEventListener("change", () => {
@@ -1920,6 +1556,7 @@
         lang = langSelect.value;
         langLabel.textContent = langSelect.options[langSelect.selectedIndex].textContent;
         if (recognition) recognition.lang = lang;
+        populateVoices();
         log("Language set to " + lang);
       });
 
@@ -1943,18 +1580,10 @@
       btnNews.addEventListener("click", () => runCommandPipeline("news"));
       btnQuote.addEventListener("click", () => runCommandPipeline("motivate"));
       btnSpotify.addEventListener("click", () => runCommandPipeline("play spotify"));
-
       btnTranslate.addEventListener("click", () => {
         const phrase = prompt("Phrase to translate:");
-        if (phrase) {
-          openUrl(
-            "https://translate.google.com/?sl=auto&tl=en&text=" +
-            encodeURIComponent(phrase) +
-            "&op=translate"
-          );
-        }
+        if (phrase) openUrl("https://translate.google.com/?sl=auto&tl=en&text=" + encodeURIComponent(phrase) + "&op=translate");
       });
-
       btnScreenshot.addEventListener("click", takeScreenshot);
       btnSelfDestruct.addEventListener("click", runSelfDestruct);
       btnRPS.addEventListener("click", playRPS);
@@ -1966,6 +1595,7 @@
         const mems = getMemories();
         mems.push({ text: txt, time: Date.now() });
         setMemories(mems);
+        stats.memoriesSaved++; saveStats();
         speak("Saved that memory.");
         log("Memory saved: " + txt);
         renderMemories();
@@ -1979,6 +1609,7 @@
         const mems = getMemories();
         mems.push({ text: t, time: Date.now() });
         setMemories(mems);
+        stats.memoriesSaved++; saveStats();
         memInput.value = "";
         renderMemories();
         speak("Memory added.");
@@ -1986,20 +1617,35 @@
 
       btnSaveWake.addEventListener("click", () => {
         const w = wakeInput.value.trim().toLowerCase();
-        if (!w) {
-          alert("Enter wake phrase");
-          return;
-        }
+        if (!w) { alert("Enter wake phrase"); return; }
         customWake = w;
         localStorage.setItem("jarvis_wake", w);
         speak("Custom wake phrase saved as " + w);
         log("Custom wake phrase: " + w);
       });
 
+      btnThemeToggle?.addEventListener("click", toggleTheme);
+
+      btnVoiceTest?.addEventListener("click", () => {
+        unlockSpeech();
+        speak("Jarvis voice system is now online.");
+      });
+
+      btnClearMemories?.addEventListener("click", () => {
+        if (!confirm("Delete all saved memories?")) return;
+        setMemories([]);
+        renderMemories();
+        speak("All memories cleared.");
+      });
+
+      jarvisOrb?.addEventListener("click", () => {
+        unlockSpeech();
+        speak("Jarvis online. Awaiting your command.");
+      });
+
       btnFaceCapture.addEventListener("click", async () => {
         try {
           if (!navigator.mediaDevices?.getUserMedia) throw new Error("Camera not supported");
-
           const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
           const video = document.createElement("video");
           video.style.display = "none";
@@ -2029,11 +1675,7 @@
       });
 
       btnFaceLogin.addEventListener("click", async () => {
-        if (!faceDataUrl) {
-          alert("No face enrolled. Capture first.");
-          return;
-        }
-
+        if (!faceDataUrl) { alert("No face enrolled. Capture first."); return; }
         try {
           const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
           const video = document.createElement("video");
@@ -2078,18 +1720,15 @@
 
       btnCameraSnap.addEventListener("click", () => {
         if (!camStream) return;
-
         const canvas = document.createElement("canvas");
         canvas.width = camVideo.videoWidth;
         canvas.height = camVideo.videoHeight;
         canvas.getContext("2d").drawImage(camVideo, 0, 0, canvas.width, canvas.height);
-
         const url = canvas.toDataURL("image/png");
         const a = document.createElement("a");
         a.href = url;
         a.download = "cam-snap.png";
         a.click();
-
         log("Camera snapshot taken");
         speak("Snapshot saved");
       });
@@ -2097,22 +1736,12 @@
       unlockBtn.addEventListener("click", unlockScreen);
 
       window.Jarvis = {
-        speak,
-        takeScreenshot,
-        openCamera,
-        closeCamera,
-        flashlight,
-        restartAnimation,
-        powerOffAnimation,
-        openNews,
-        keepScreenOn,
-        allowSleep,
-        showMemories,
-        renderMemories
+        speak, takeScreenshot, openCamera, closeCamera, flashlight, restartAnimation,
+        powerOffAnimation, openNews, keepScreenOn, allowSleep, showMemories, renderMemories
       };
 
       init();
     })();
   </script>
 </body>
-</html>
+  </html>
