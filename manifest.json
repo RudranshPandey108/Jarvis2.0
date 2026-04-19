@@ -1,7 +1,7 @@
 {
-  "name": "Jarvis Web Voice Assistant ULTRA",
+  "name": "Jarvis Web Voice Assistant ULTRA FINAL",
   "short_name": "Jarvis",
-  "description": "Futuristic client-side voice assistant PWA",
+  "description": "Futuristic client-side voice assistant PWA with music console",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
