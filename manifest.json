@@ -1,12 +1,23 @@
 {
   "name": "Jarvis Web Voice Assistant ULTRA FINAL",
   "short_name": "Jarvis",
-  "description": "Futuristic client-side voice assistant PWA with music console",
+  "description": "Futuristic client-side voice assistant PWA with smart music player",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#081018",
   "theme_color": "#081018",
   "orientation": "portrait-primary",
-  "icons": []
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
