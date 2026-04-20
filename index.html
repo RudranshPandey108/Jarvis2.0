@@ -909,8 +909,7 @@
   <div class="hud-glow"></div>
   <div class="hud-glow2"></div>
 
-  <div class="wrap">
-    <header>
+  <div class="wrap"><header>
       <div class="hero">
         <h1>Jarvis — Web Voice Assistant ULTRA FINAL</h1>
         <div class="sub">
@@ -1369,12 +1368,13 @@
         memoriesSaved: 0,
         jokesTold: 0
       });
-      
-let audio = new Audio();
+
       const localSongs = {
-        "Tu Hi Hai Aashiqui":"songs/Tu Hi Hai Aashiqui.mp3",
-        "Har Har Shambhu Shiv Mahadeva": "songs/Har Har Shambhu Shiv Mahadeva.mp3",
-        "kesariya": ""
+        "aashiqui": "songs/Tu Hi Hai Aashiqui.mp3",
+        "tu hi hai aashiqui": "songs/Tu Hi Hai Aashiqui.mp3",
+        "shambhu": "songs/Har Har Shambhu Shiv Mahadeva.mp3",
+        "har har shambhu": "songs/Har Har Shambhu Shiv Mahadeva.mp3",
+        "har har shambhu shiv mahadeva": "songs/Har Har Shambhu Shiv Mahadeva.mp3"
       };
 
       const jokes = [
@@ -1393,11 +1393,11 @@ let audio = new Audio();
 
       function escapeHtml(s) {
         return String(s).replace(/[&<>"']/g, m => ({
-          "&":"&amp;",
-          "<":"&lt;",
-          ">":"&gt;",
-          '"':"&quot;",
-          "'":"&#39;"
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
         }[m]));
       }
 
@@ -1658,10 +1658,10 @@ let audio = new Audio();
           [/^(joke suna|joke bolo)$/i, "joke"],
           [/^(motivate karo|motivation do|quote do)$/i, "motivate"],
           [/^(screenshot lo|screen shot lo)$/i, "screenshot"],
-          [/^(flashlight on karo|torch on करो|torch on)$/i, "flashlight on"],
-          [/^(flashlight off karo|torch off करो|torch off)$/i, "flashlight off"],
-          [/^(lock screen करो|screen lock करो)$/i, "lock screen"],
-          [/^(unlock screen करो|screen unlock करो)$/i, "unlock screen"],
+          [/^(flashlight on karo|torch on)$/i, "flashlight on"],
+          [/^(flashlight off karo|torch off)$/i, "flashlight off"],
+          [/^(lock screen karo|screen lock karo)$/i, "lock screen"],
+          [/^(unlock screen karo|screen unlock karo)$/i, "unlock screen"],
           [/^(vibrate karo)$/i, "vibrate"],
           [/^(restart karo|phone restart karo)$/i, "restart phone"],
           [/^(shutdown karo|power off karo)$/i, "power off phone"],
@@ -1715,6 +1715,18 @@ let audio = new Audio();
           .trim();
       }
 
+      function normalizeSongKey(query) {
+        const q = query.toLowerCase().trim();
+        if (localSongs[q]) return q;
+
+        if (q.includes("aashiqui")) return "aashiqui";
+        if (q.includes("shambhu")) return "shambhu";
+        if (q.includes("mahadeva")) return "shambhu";
+        if (q.includes("shiv")) return "shambhu";
+
+        return q;
+      }
+
       async function searchYouTubeFirstVideo(query) {
         try {
           const url = "https://www.youtube.com/results?search_query=" + encodeURIComponent(query);
@@ -1729,10 +1741,11 @@ let audio = new Audio();
       }
 
       async function playSongOnYouTube(query) {
-        const localKey = query.toLowerCase();
-        if (localSongs[localKey]) {
-          playInAppAudio(localSongs[localKey]);
-          speak("Playing " + query + " in app");
+        const key = normalizeSongKey(query);
+
+        if (localSongs[key]) {
+          playInAppAudio(localSongs[key]);
+          speak("Playing " + key + " in app");
           return true;
         }
 
@@ -1776,17 +1789,6 @@ let audio = new Audio();
           .catch(err => {
             log("In-app audio failed: " + err.message, "err");
           });
-      }
-      function playLocalSong(name){
-  let song = name.toLowerCase();
-
-  if(localSongs[song]){
-    audio.src = localSongs[song];
-    audio.play();
-    speak("Playing " + song);
-  } else {
-    speak("Song not found");
-  }
       }
 
       function setupRecognition() {
@@ -1883,17 +1885,20 @@ let audio = new Audio();
           addTranscriptEntry("Jarvis: Hello. How can I help?");
           return;
         }
-        if(lower.startsWith("play ")){
-  let song = lower.replace("play ", "").trim();
-  playLocalSong(song);
-  return;
-        }
 
         if (/^play\s+/i.test(text)) {
           const query = extractSongQuery(text);
 
           if (!query) {
             speak("Please tell me the song name");
+            return;
+          }
+
+          const key = normalizeSongKey(query);
+
+          if (localSongs[key]) {
+            playInAppAudio(localSongs[key]);
+            speak("Playing " + key);
             return;
           }
 
@@ -2283,7 +2288,7 @@ let audio = new Audio();
 
       function vibrate() {
         if ("vibrate" in navigator) {
-          navigator.vibrate([60,40,60,40,120]);
+          navigator.vibrate([60, 40, 60, 40, 120]);
           log("Vibration pattern played");
         } else {
           alert("Vibration not supported on this device");
@@ -2388,13 +2393,13 @@ let audio = new Audio();
 
         for (let i = 0; i < 220; i++) {
           sparks.push({
-            x: window.innerWidth/2 + (Math.random()-0.5)*200,
-            y: window.innerHeight/2 + (Math.random()-0.5)*200,
-            vx: (Math.random()-0.5)*14,
-            vy: (Math.random()-0.9)*14 - 4,
-            r: Math.random()*6+2,
-            life: Math.random()*100+40,
-            color: `rgba(${200+Math.floor(Math.random()*55)},${Math.floor(Math.random()*140)},0,`
+            x: window.innerWidth / 2 + (Math.random() - 0.5) * 200,
+            y: window.innerHeight / 2 + (Math.random() - 0.5) * 200,
+            vx: (Math.random() - 0.5) * 14,
+            vy: (Math.random() - 0.9) * 14 - 4,
+            r: Math.random() * 6 + 2,
+            life: Math.random() * 100 + 40,
+            color: `rgba(${200 + Math.floor(Math.random() * 55)},${Math.floor(Math.random() * 140)},0,`
           });
         }
 
@@ -2404,7 +2409,7 @@ let audio = new Audio();
 
         const id = setInterval(() => {
           ctx.fillStyle = "rgba(0,0,0,.12)";
-          ctx.fillRect(0,0,c.width,c.height);
+          ctx.fillRect(0, 0, c.width, c.height);
 
           sparks.forEach(p => {
             p.x += p.vx;
@@ -2412,19 +2417,19 @@ let audio = new Audio();
             p.vy += 0.18;
             p.life--;
             ctx.beginPath();
-            ctx.fillStyle = p.color + (p.life/140) + ")";
-            ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+            ctx.fillStyle = p.color + (p.life / 140) + ")";
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
             ctx.fill();
           });
 
           t++;
           if (t % 6 === 0) {
-            document.body.style.transform = `translate(${(Math.random()-0.5)*8}px, ${(Math.random()-0.5)*8}px)`;
+            document.body.style.transform = `translate(${(Math.random() - 0.5) * 8}px, ${(Math.random() - 0.5) * 8}px)`;
           }
 
           if (t > 160) {
             clearInterval(id);
-            ctx.clearRect(0,0,c.width,c.height);
+            ctx.clearRect(0, 0, c.width, c.height);
             c.style.display = "none";
             document.body.style.transform = originalTransform;
             log("Self-destruct animation done");
@@ -2433,26 +2438,26 @@ let audio = new Audio();
       }
 
       function playRPS() {
-        const choices = ["rock","paper","scissors"];
+        const choices = ["rock", "paper", "scissors"];
         const user = prompt("Choose rock, paper or scissors:");
         if (!user) return;
         const u = user.toLowerCase();
         if (!choices.includes(u)) { alert("Invalid choice"); return; }
-        const bot = choices[Math.floor(Math.random()*3)];
+        const bot = choices[Math.floor(Math.random() * 3)];
         let res = "Draw";
-        if ((u==="rock"&&bot==="scissors") || (u==="paper"&&bot==="rock") || (u==="scissors"&&bot==="paper")) res = "You win!";
+        if ((u === "rock" && bot === "scissors") || (u === "paper" && bot === "rock") || (u === "scissors" && bot === "paper")) res = "You win!";
         else if (u !== bot) res = "You lose!";
         speak(`You chose ${u}. I chose ${bot}. ${res}`);
         alert(`You: ${u}\nJarvis: ${bot}\n\n${res}`);
       }
 
       function playGuess() {
-        const target = Math.floor(Math.random()*50)+1;
+        const target = Math.floor(Math.random() * 50) + 1;
         let tries = 0;
         let ok = false;
 
         while (tries < 7) {
-          const g = prompt("Guess the number (1-50). Attempts left: " + (7-tries));
+          const g = prompt("Guess the number (1-50). Attempts left: " + (7 - tries));
           if (g === null) return;
           const n = parseInt(g, 10);
           if (Number.isNaN(n)) { alert("Enter a number"); continue; }
@@ -2507,13 +2512,13 @@ let audio = new Audio();
 
         let sum = 0, len = 0;
         for (let i = 0; i < da.length; i += 4) {
-          const la = 0.299*da[i] + 0.587*da[i+1] + 0.114*da[i+2];
-          const lb = 0.299*db[i] + 0.587*db[i+1] + 0.114*db[i+2];
-          sum += Math.abs(la-lb);
+          const la = 0.299 * da[i] + 0.587 * da[i + 1] + 0.114 * da[i + 2];
+          const lb = 0.299 * db[i] + 0.587 * db[i + 1] + 0.114 * db[i + 2];
+          sum += Math.abs(la - lb);
           len++;
         }
 
-        return sum / (len*255);
+        return sum / (len * 255);
       }
 
       function renderFacePreview(data) {
@@ -2545,7 +2550,7 @@ let audio = new Audio();
         if (/^weather$/.test(lower)) { openUrl("https://wttr.in/?format=3"); return true; }
         if (/^play spotify$/.test(lower)) { openUrl("https://open.spotify.com/collection/playlists"); return true; }
         if (/^screenshot$/.test(lower)) { takeScreenshot(); return true; }
-        if (/^motivate$/.test(lower)) { speak(quotes[Math.floor(Math.random()*quotes.length)]); return true; }
+        if (/^motivate$/.test(lower)) { speak(quotes[Math.floor(Math.random() * quotes.length)]); return true; }
         if (/^self destruct$/.test(lower)) { runSelfDestruct(); return true; }
 
         if (/^remember /.test(lower)) {
