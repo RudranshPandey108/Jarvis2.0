@@ -10,22 +10,22 @@
 
   <style>
     :root{
-      --bg:#060d16;
-      --bg2:#091423;
-      --panel:#0b1624;
-      --panel2:#0e1c2d;
-      --card:#101c2b;
-      --glass:rgba(255,255,255,.04);
+      --bg:#050b14;
+      --bg2:#091321;
+      --panel:#0c1726;
+      --panel2:#0f1e31;
+      --card:#111d2d;
+      --glass:rgba(255,255,255,.045);
       --glass2:rgba(255,255,255,.025);
       --line:rgba(255,255,255,.08);
-      --muted:#90a4b7;
+      --muted:#95a9bc;
       --text:#eaf3ff;
       --accent:#ff7a18;
-      --accent2:#19d36b;
-      --accent3:#2ed3ff;
-      --danger:#ff6b57;
+      --accent2:#18d56b;
+      --accent3:#2ecfff;
       --success:#22c55e;
-      --shadow:0 20px 50px rgba(0,0,0,.35);
+      --danger:#ff6957;
+      --shadow:0 20px 50px rgba(0,0,0,.34);
       --radius:18px;
       --radius2:24px;
     }
@@ -44,8 +44,8 @@
       font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
       background:
         radial-gradient(circle at top right, rgba(255,122,24,.10), transparent 26%),
-        radial-gradient(circle at bottom left, rgba(25,211,107,.09), transparent 24%),
-        radial-gradient(circle at center, rgba(46,211,255,.05), transparent 34%),
+        radial-gradient(circle at bottom left, rgba(24,213,107,.09), transparent 24%),
+        radial-gradient(circle at center, rgba(46,207,255,.05), transparent 34%),
         linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);
       color:var(--text);
       overflow-x:hidden;
@@ -53,25 +53,17 @@
     }
 
     body.light-mode{
-      --bg:#edf5ff;
-      --bg2:#dbe9f7;
+      --bg:#ecf5ff;
+      --bg2:#d9e9f8;
       --panel:#ffffff;
-      --panel2:#f5f9fe;
+      --panel2:#f4f9fe;
       --card:#ffffff;
-      --glass:rgba(255,255,255,.70);
-      --glass2:rgba(255,255,255,.55);
+      --glass:rgba(255,255,255,.74);
+      --glass2:rgba(255,255,255,.58);
       --line:rgba(0,0,0,.08);
       --muted:#506477;
       --text:#122436;
       --shadow:0 18px 45px rgba(20,40,80,.12);
-    }
-
-    .wrap{
-      max-width:1180px;
-      margin:0 auto;
-      padding:18px;
-      position:relative;
-      z-index:1;
     }
 
     .bg-grid{
@@ -84,7 +76,7 @@
         linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
       background-size:28px 28px;
-      mask-image:radial-gradient(circle at center, black 40%, transparent 90%);
+      mask-image:radial-gradient(circle at center, black 42%, transparent 92%);
     }
 
     .hud-glow{
@@ -105,12 +97,20 @@
       width:420px;
       height:420px;
       border-radius:50%;
-      background:radial-gradient(circle, rgba(25,211,107,.12), transparent 62%);
+      background:radial-gradient(circle, rgba(24,213,107,.12), transparent 62%);
       filter:blur(20px);
       bottom:-120px;
       left:-120px;
       pointer-events:none;
       z-index:0;
+    }
+
+    .wrap{
+      max-width:1180px;
+      margin:0 auto;
+      padding:18px;
+      position:relative;
+      z-index:1;
     }
 
     header{
@@ -225,7 +225,7 @@
       inset:0;
       background:
         radial-gradient(circle at 18% 25%, rgba(255,122,24,.16), transparent 24%),
-        radial-gradient(circle at 82% 72%, rgba(25,211,107,.14), transparent 25%);
+        radial-gradient(circle at 82% 72%, rgba(24,213,107,.14), transparent 25%);
       pointer-events:none;
     }
 
@@ -716,7 +716,7 @@
       overflow:hidden;
       background:
         radial-gradient(circle at center, rgba(255,122,24,.10), transparent 35%),
-        radial-gradient(circle at center, rgba(25,211,107,.08), transparent 45%),
+        radial-gradient(circle at center, rgba(24,213,107,.08), transparent 45%),
         linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
     }
 
@@ -751,14 +751,14 @@
       position:absolute;
       border-radius:50%;
       border:2px solid rgba(255,255,255,.08);
-      box-shadow:0 0 20px rgba(255,122,24,.08), 0 0 24px rgba(25,211,107,.06);
+      box-shadow:0 0 20px rgba(255,122,24,.08), 0 0 24px rgba(24,213,107,.06);
     }
 
     .boot-ring.outer{
       width:180px;
       height:180px;
       border-top-color:var(--accent);
-      border-right-color:rgba(25,211,107,.8);
+      border-right-color:rgba(24,213,107,.8);
       animation:spinRing 7s linear infinite;
     }
 
@@ -791,9 +791,9 @@
       color:#fff;
       background:
         radial-gradient(circle at 35% 35%, rgba(255,255,255,.55), transparent 18%),
-        radial-gradient(circle at center, rgba(255,122,24,.45), rgba(25,211,107,.24), rgba(0,0,0,.5));
+        radial-gradient(circle at center, rgba(255,122,24,.45), rgba(24,213,107,.24), rgba(0,0,0,.5));
       border:1px solid rgba(255,255,255,.16);
-      box-shadow:0 0 24px rgba(255,122,24,.22),0 0 24px rgba(25,211,107,.18);
+      box-shadow:0 0 24px rgba(255,122,24,.22),0 0 24px rgba(24,213,107,.18);
     }
 
     .boot-grid{
@@ -1104,7 +1104,7 @@
           <div style="font-weight:700; margin-bottom:8px;">In-App Audio Player</div>
           <audio id="jarvisAudio" controls style="width:100%;"></audio>
           <div class="hint" style="margin-top:8px;">
-            This player works only for audio files/URLs you provide manually in the local library. It cannot magically stream all songs from Spotify/YouTube inside the app.
+            This player works only for audio files/URLs you provide manually in the local library.
           </div>
         </div>
 
@@ -1256,7 +1256,6 @@
 
   <canvas id="boomCanvas"></canvas>
   <div id="jarvisOrb" title="Jarvis Orb"></div>
-
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
