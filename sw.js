@@ -1,4 +1,4 @@
-const CACHE_NAME = "jarvis-ultra-final-pwa-v3";
+const CACHE_NAME = "jarvis-ultra-final-pwa-v5";
 const APP_SHELL = [
   "./",
   "./index.html",
