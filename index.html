@@ -1369,7 +1369,8 @@
         memoriesSaved: 0,
         jokesTold: 0
       });
-
+      
+let audio = new Audio();
       const localSongs = {
         "Tu Hi Hai Aashiqui":"songs/Tu Hi Hai Aashiqui.mp3",
         "Har Har Shambhu Shiv Mahadeva": "songs/Har Har Shambhu Shiv Mahadeva.mp3",
@@ -1776,6 +1777,17 @@
             log("In-app audio failed: " + err.message, "err");
           });
       }
+      function playLocalSong(name){
+  let song = name.toLowerCase();
+
+  if(localSongs[song]){
+    audio.src = localSongs[song];
+    audio.play();
+    speak("Playing " + song);
+  } else {
+    speak("Song not found");
+  }
+      }
 
       function setupRecognition() {
         if (!SpeechRecognition) {
@@ -1870,6 +1882,11 @@
           speak("Hello. How can I help?");
           addTranscriptEntry("Jarvis: Hello. How can I help?");
           return;
+        }
+        if(lower.startsWith("play ")){
+  let song = lower.replace("play ", "").trim();
+  playLocalSong(song);
+  return;
         }
 
         if (/^play\s+/i.test(text)) {
