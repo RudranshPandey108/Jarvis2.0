@@ -872,1788 +872,1776 @@
   <canvas id="boomCanvas"></canvas>
   <div id="jarvisOrb" title="Jarvis Orb"></div>
   <script>
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js").catch(err => console.warn("SW register failed", err));
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(err => console.warn("SW register failed", err));
+  });
+}
+
+(() => {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const synth = window.speechSynthesis;
+
+  const $ = id => document.getElementById(id);
+
+  const btnStart = $("btnStart");
+  const btnStop = $("btnStop");
+  const btnSend = $("btnSend");
+  const cmdInput = $("cmdInput");
+  const transcriptEl = $("transcript");
+  const logEl = $("log");
+  const listenStatus = $("listenStatus");
+  const listenDot = $("listenDot");
+  const chkVoice = $("chkVoice");
+  const chkContinuous = $("chkContinuous");
+  const chkWakeReq = $("chkWakeReq");
+  const btnWake = $("btnWake");
+  const wakeState = $("wakeState");
+  const wakeInput = $("wakeInput");
+  const btnSaveWake = $("btnSaveWake");
+  const voiceSelect = $("voiceSelect");
+  const langSelect = $("langSelect");
+  const langLabel = $("langLabel");
+
+  const btnPlayYT = $("btnPlayYT");
+  const btnPlaySP = $("btnPlaySP");
+  const btnStopAudio = $("btnStopAudio");
+  const btnStartSong = $("btnStartSong");
+  const btnPrevSong = $("btnPrevSong");
+  const btnNextSong = $("btnNextSong");
+  const btnLikeSong = $("btnLikeSong");
+  const btnPlayPauseSong = $("btnPlayPauseSong");
+  const musicInput = $("musicInput");
+  const jarvisAudio = $("jarvisAudio");
+  const nowPlayingText = $("nowPlayingText");
+  const playerSongTitle = $("playerSongTitle");
+  const playerSongMeta = $("playerSongMeta");
+  const likedBadge = $("likedBadge");
+  const playlistBox = $("playlistBox");
+  const likedSongsBox = $("likedSongsBox");
+
+  const powerOverlay = $("powerOverlay");
+  const restartText = $("restartText");
+  const flashlightOverlay = $("flashlightOverlay");
+  const lockOverlay = $("lockOverlay");
+  const unlockBtn = $("unlockBtn");
+
+  const cameraOverlay = $("cameraOverlay");
+  const camVideo = $("camVideo");
+  const btnCloseCamera = $("btnCloseCamera");
+  const btnSwitchCamera = $("btnSwitchCamera");
+  const btnCameraSnap = $("btnCameraSnap");
+
+  const btnWeather = $("btnWeather");
+  const btnNews = $("btnNews");
+  const btnQuote = $("btnQuote");
+  const btnTranslate = $("btnTranslate");
+  const btnScreenshot = $("btnScreenshot");
+  const btnSpotify = $("btnSpotify");
+  const btnSelfDestruct = $("btnSelfDestruct");
+  const boomCanvas = $("boomCanvas");
+  const btnRPS = $("btnRPS");
+  const btnGuess = $("btnGuess");
+
+  const memInput = $("memInput");
+  const memAdd = $("memAdd");
+  const memList = $("memList");
+  const btnSaveMemory = $("btnSaveMemory");
+  const btnShowMemory = $("btnShowMemory");
+
+  const btnFaceCapture = $("btnFaceCapture");
+  const btnFaceLogin = $("btnFaceLogin");
+  const faceStatus = $("faceStatus");
+  const facePreview = $("facePreview");
+
+  const btnThemeToggle = $("btnThemeToggle");
+  const btnVoiceTest = $("btnVoiceTest");
+  const btnClearMemories = $("btnClearMemories");
+  const btnInstallApp = $("btnInstallApp");
+  const btnInstallAppBanner = $("btnInstallAppBanner");
+  const btnDismissInstall = $("btnDismissInstall");
+  const installBanner = $("installBanner");
+  const bootPanel = $("bootPanel");
+  const bootText = $("bootText");
+  const bootBar = $("bootBar");
+  const bootPercent = $("bootPercent");
+  const jarvisOrb = $("jarvisOrb");
+  const recentCommands = $("recentCommands");
+  const statsBox = $("statsBox");
+  const statCommandsMini = $("statCommandsMini");
+  const statMemoriesMini = $("statMemoriesMini");
+  const voiceMeterFill = $("voiceMeter")?.firstElementChild;
+
+  let recognition = null;
+  let listening = false;
+  let manuallyStopped = false;
+  let wakeWordOn = false;
+  let customWake = (localStorage.getItem("jarvis_wake") || "hey jarvis").trim().toLowerCase();
+  let lang = "en-US";
+  let availableVoices = [];
+  let camStream = null;
+  let usingBackCam = true;
+  let wakeLock = null;
+  let deferredPrompt = null;
+  let faceDataUrl = localStorage.getItem("jarvis_face") || null;
+  let audioContext = null;
+  let analyser = null;
+  let meterSource = null;
+  let meterRaf = null;
+
+  const songsLibrary = [
+    {
+      id: "bahubali",
+      title: "Jiyo Re Bahubali",
+      artist: "Jarvis Local Music",
+      file: "songs/01 Jiyo Re Bahubali - Bahubali 2 - 320Kbps.mp3",
+      aliases: ["bahubali", "jiyo re bahubali"]
+    },
+    {
+      id: "chammak",
+      title: "Chammak Challo",
+      artist: "Jarvis Local Music",
+      file: "songs/01. Chammak Challo.mp3",
+      aliases: ["chammak", "chammak challo"]
+    },
+    {
+      id: "akh-lad-jave",
+      title: "Akh Lad Jave",
+      artist: "Jarvis Local Music",
+      file: "songs/02 Akh Lad Jave - Loveratri.mp3",
+      aliases: ["akh lad jave", "akh lad"]
+    },
+    {
+      id: "jitni-dafa",
+      title: "Jitni Dafa",
+      artist: "Jarvis Local Music",
+      file: "songs/02 Jitni Dafa - Parmanu 320Kbps (3).mp3",
+      aliases: ["jitni dafa"]
+    },
+    {
+      id: "chand",
+      title: "Chand Sifarish",
+      artist: "Jarvis Local Music",
+      file: "songs/02. Chand Sifarish.mp3",
+      aliases: ["chand sifarish", "chand"]
+    },
+    {
+      id: "tere-liye",
+      title: "Tere Liye",
+      artist: "Jarvis Local Music",
+      file: "songs/02. Tere Liye.mp3",
+      aliases: ["tere liye"]
+    },
+    {
+      id: "teri-masumiyat",
+      title: "Teri Masumiyat",
+      artist: "Jarvis Local Music",
+      file: "songs/04 Teri Masumiyat - Bezubaan Ishq.mp3",
+      aliases: ["teri masumiyat"]
+    },
+    {
+      id: "intkam",
+      title: "Mera Intkam Dekhegi",
+      artist: "Jarvis Local Music",
+      file: "songs/05 Mera Intkam Dekhegi.mp3",
+      aliases: ["intkam", "mera intkam dekhegi"]
+    },
+    {
+      id: "jaanam",
+      title: "Jaanam",
+      artist: "Jarvis Local Music",
+      file: "songs/128-Jaanam - Bad Newz 128 Kbps.mp3",
+      aliases: ["jaanam"]
+    },
+    {
+      id: "shambhu",
+      title: "Har Har Shambhu Shiv Mahadeva",
+      artist: "Jarvis Local Music",
+      file: "songs/Har Har Shambhu Shiv Mahadeva.mp3",
+      aliases: ["shambhu", "har har shambhu", "har har shambhu shiv mahadeva", "mahadev"]
+    },
+    {
+      id: "aashiqui",
+      title: "Tu Hi Hai Aashiqui",
+      artist: "Jarvis Local Music",
+      file: "songs/Tu Hi Hai Aashiqui.mp3",
+      aliases: ["aashiqui", "tu hi hai", "tu hi hai aashiqui"]
+    }
+  ];
+
+  let currentSongIndex = -1;
+  let likedSongs = loadJson("jarvis_liked_songs", []);
+
+  const jokes = [
+    "Why did the developer go broke? Because he used up all his cache.",
+    "Why do programmers prefer dark mode? Because the light attracts bugs.",
+    "I told my computer I needed a break, and it said: no problem, I will go to sleep."
+  ];
+
+  const quotes = [
+    "The best time to plant a tree was 20 years ago. The second best time is now.",
+    "Do not watch the clock; do what it does. Keep going.",
+    "Discipline beats motivation when motivation goes missing."
+  ];
+
+  let commandHistory = loadJson("jarvis_command_history", []);
+  let stats = loadJson("jarvis_stats", {
+    commandsRun: 0,
+    searches: 0,
+    screenshots: 0,
+    memoriesSaved: 0,
+    jokesTold: 0
+  });
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[m]));
+  }
+
+  function log(message, type = "info") {
+    const time = new Date().toLocaleTimeString();
+    const el = document.createElement("div");
+    const tone = type === "err" ? "#ffb4b4" : "#d7e7ff";
+    const stamp = type === "err" ? "#ff997f" : "#9ae6b4";
+    el.innerHTML = `<strong style="color:${stamp}">${time}</strong> — <span style="color:${tone}">${escapeHtml(message)}</span>`;
+    logEl?.prepend(el);
+  }
+
+  function saveJson(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+
+  function loadJson(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  function setListeningUI(isLive) {
+    if (listenStatus) listenStatus.textContent = isLive ? "Listening..." : "Idle";
+    if (listenDot) listenDot.classList.toggle("live", isLive);
+    if (btnStart) btnStart.textContent = isLive ? "Listening" : "Start Listening";
+  }
+
+  function addTranscriptEntry(txt, type = "sys") {
+    if (!transcriptEl) return;
+    const p = document.createElement("div");
+    p.style.marginTop = "8px";
+    p.style.fontSize = "14px";
+    p.style.color = type === "err" ? "#ffb3b3" : "#dbeafe";
+    p.textContent = txt;
+    transcriptEl.appendChild(p);
+    transcriptEl.scrollTop = transcriptEl.scrollHeight;
+  }
+
+  function openUrl(url) {
+    const win = window.open(url, "_blank");
+    if (!win) window.location.href = url;
+  }
+
+  function populateVoices() {
+    if (!synth || !voiceSelect) return;
+    availableVoices = synth.getVoices() || [];
+    voiceSelect.innerHTML = "";
+
+    if (!availableVoices.length) {
+      const opt = document.createElement("option");
+      opt.value = "";
+      opt.textContent = "Default browser voice";
+      voiceSelect.appendChild(opt);
+      return;
+    }
+
+    availableVoices.forEach((voice, i) => {
+      const opt = document.createElement("option");
+      opt.value = String(i);
+      opt.textContent = `${voice.name} — ${voice.lang}${voice.default ? " (default)" : ""}`;
+      voiceSelect.appendChild(opt);
+    });
+
+    const saved = localStorage.getItem("jarvis_voice_index");
+    if (saved && availableVoices[Number(saved)]) {
+      voiceSelect.value = saved;
+    }
+  }
+
+  if (synth) {
+    populateVoices();
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = populateVoices;
+    }
+  }
+
+  function speak(text) {
+    if (!chkVoice?.checked) return;
+    if (!synth) return;
+
+    try {
+      synth.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = lang;
+
+      const selectedIndex = Number(voiceSelect?.value);
+      if (!Number.isNaN(selectedIndex) && availableVoices[selectedIndex]) {
+        utter.voice = availableVoices[selectedIndex];
+        utter.lang = availableVoices[selectedIndex].lang || lang;
+      }
+
+      synth.speak(utter);
+      log("Jarvis: " + text);
+    } catch (err) {
+      log("Speech failed: " + err.message, "err");
+    }
+  }
+
+  function unlockSpeech() {
+    try {
+      const u = new SpeechSynthesisUtterance(" ");
+      u.volume = 0;
+      synth?.speak(u);
+      synth?.cancel();
+    } catch {}
+  }
+
+  function normalizeCommand(text) {
+    return text.trim();
+  }
+
+  function normalizeHindiAliases(text) {
+    const cleaned = text.trim();
+
+    if (/^gaana chalao /i.test(cleaned)) return cleaned.replace(/^gaana chalao /i, "play ");
+    if (/^song chalao /i.test(cleaned)) return cleaned.replace(/^song chalao /i, "play ");
+    if (/^gaana bajao /i.test(cleaned)) return cleaned.replace(/^gaana bajao /i, "play ");
+    if (/^youtube pe /i.test(cleaned)) return cleaned.replace(/^youtube pe /i, "play ") + " on youtube";
+    if (/^spotify pe /i.test(cleaned)) return cleaned.replace(/^spotify pe /i, "play ") + " on spotify";
+    if (/^(samay|time batao|kitna baje)$/i.test(cleaned)) return "time";
+    if (/^(date batao|aaj ki date)$/i.test(cleaned)) return "date";
+    if (/^(news kholo|top news)$/i.test(cleaned)) return "news";
+    if (/^(mausam|weather batao)$/i.test(cleaned)) return "weather";
+    if (/^(agla gana|next gana)$/i.test(cleaned)) return "next song";
+    if (/^(pichla gana|previous gana)$/i.test(cleaned)) return "previous song";
+    if (/^(gana pause karo)$/i.test(cleaned)) return "pause song";
+    if (/^(gana chalu karo|resume gana)$/i.test(cleaned)) return "resume song";
+    if (/^(gana like karo)$/i.test(cleaned)) return "like song";
+
+    return cleaned;
+  }
+
+  function getSongByQuery(query) {
+    const q = query.toLowerCase().trim();
+
+    for (let i = 0; i < songsLibrary.length; i++) {
+      const song = songsLibrary[i];
+      if (song.aliases.some(alias => alias === q)) return i;
+    }
+
+    for (let i = 0; i < songsLibrary.length; i++) {
+      const song = songsLibrary[i];
+      if (song.aliases.some(alias => alias.includes(q) || q.includes(alias))) return i;
+    }
+
+    return -1;
+  }
+
+  function updateNowPlayingUI() {
+    if (currentSongIndex < 0 || !songsLibrary[currentSongIndex]) {
+      if (nowPlayingText) nowPlayingText.textContent = "No song playing";
+      if (playerSongTitle) playerSongTitle.textContent = "Nothing selected";
+      if (playerSongMeta) playerSongMeta.textContent = "Jarvis Local Music System";
+      if (likedBadge) likedBadge.textContent = "♡ Not liked";
+      return;
+    }
+
+    const song = songsLibrary[currentSongIndex];
+    if (nowPlayingText) nowPlayingText.textContent = `Now Playing: ${song.title}`;
+    if (playerSongTitle) playerSongTitle.textContent = song.title;
+    if (playerSongMeta) playerSongMeta.textContent = `${song.artist} • Local File`;
+    if (likedBadge) likedBadge.textContent = likedSongs.includes(song.id) ? "❤ Liked" : "♡ Not liked";
+  }
+
+  function renderPlaylist() {
+    if (!playlistBox) return;
+    playlistBox.innerHTML = "";
+
+    songsLibrary.forEach((song, index) => {
+      const row = document.createElement("div");
+      row.style.padding = "10px";
+      row.style.borderBottom = "1px dashed rgba(255,255,255,.04)";
+      row.style.display = "flex";
+      row.style.justifyContent = "space-between";
+      row.style.gap = "8px";
+      row.style.alignItems = "center";
+
+      const active = index === currentSongIndex;
+      row.innerHTML = `
+        <div>
+          <div style="font-weight:700; color:${active ? '#9ae6b4' : '#eaf3ff'}">${escapeHtml(song.title)}</div>
+          <div class="hint">${escapeHtml(song.artist)}</div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="smallbtn song-play-btn" data-index="${index}">Play</button>
+          <button class="smallbtn song-like-btn" data-index="${index}">${likedSongs.includes(song.id) ? "Unlike" : "Like"}</button>
+        </div>
+      `;
+      playlistBox.appendChild(row);
+    });
+
+    playlistBox.querySelectorAll(".song-play-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const idx = Number(btn.getAttribute("data-index"));
+        playSongByIndex(idx);
+      });
+    });
+
+    playlistBox.querySelectorAll(".song-like-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const idx = Number(btn.getAttribute("data-index"));
+        toggleLikeSong(idx);
+      });
+    });
+  }
+
+  function renderLikedSongs() {
+    if (!likedSongsBox) return;
+    likedSongsBox.innerHTML = "";
+
+    const liked = songsLibrary.filter(song => likedSongs.includes(song.id));
+
+    if (!liked.length) {
+      likedSongsBox.textContent = "No liked songs yet";
+      return;
+    }
+
+    liked.forEach(song => {
+      const row = document.createElement("div");
+      row.style.padding = "8px";
+      row.style.borderBottom = "1px dashed rgba(255,255,255,.04)";
+      row.innerHTML = `<strong>${escapeHtml(song.title)}</strong><div class="hint">${escapeHtml(song.artist)}</div>`;
+      likedSongsBox.appendChild(row);
+    });
+  }
+
+  function playSongByIndex(index) {
+    if (index < 0 || index >= songsLibrary.length || !jarvisAudio) return;
+
+    currentSongIndex = index;
+    const song = songsLibrary[index];
+    jarvisAudio.src = song.file;
+    jarvisAudio.play()
+      .then(() => {
+        log("Playing local song: " + song.title);
+        speak("Playing " + song.title);
+        updateNowPlayingUI();
+        renderPlaylist();
+      })
+      .catch(err => {
+        log("Audio play failed: " + err.message, "err");
+        alert("Song play failed. Check file path or upload.");
+      });
+  }
+
+  function playSongFromInput() {
+    const q = musicInput?.value.trim();
+    if (!q) {
+      alert("Enter song name first");
+      return;
+    }
+
+    const idx = getSongByQuery(q);
+    if (idx >= 0) {
+      playSongByIndex(idx);
+    } else {
+      speak("Song not found in local playlist");
+    }
+  }
+
+  function playNextSong() {
+    if (!songsLibrary.length) return;
+    if (currentSongIndex < 0) {
+      playSongByIndex(0);
+      return;
+    }
+    const nextIndex = (currentSongIndex + 1) % songsLibrary.length;
+    playSongByIndex(nextIndex);
+  }
+
+  function playPreviousSong() {
+    if (!songsLibrary.length) return;
+    if (currentSongIndex < 0) {
+      playSongByIndex(0);
+      return;
+    }
+    const prevIndex = (currentSongIndex - 1 + songsLibrary.length) % songsLibrary.length;
+    playSongByIndex(prevIndex);
+  }
+
+  function toggleLikeSong(index = currentSongIndex) {
+    if (index < 0 || !songsLibrary[index]) return;
+    const songId = songsLibrary[index].id;
+
+    if (likedSongs.includes(songId)) {
+      likedSongs = likedSongs.filter(id => id !== songId);
+      speak("Removed from liked songs");
+    } else {
+      likedSongs.push(songId);
+      speak("Added to liked songs");
+    }
+
+    saveJson("jarvis_liked_songs", likedSongs);
+    updateNowPlayingUI();
+    renderPlaylist();
+    renderLikedSongs();
+  }
+
+  function togglePlayPause() {
+    if (!jarvisAudio) return;
+    if (!jarvisAudio.src && songsLibrary.length) {
+      playSongByIndex(0);
+      return;
+    }
+
+    if (jarvisAudio.paused) {
+      jarvisAudio.play();
+      speak("Resuming song");
+    } else {
+      jarvisAudio.pause();
+      speak("Pausing song");
+    }
+  }
+
+  function stopInAppAudio() {
+    if (!jarvisAudio) return;
+    jarvisAudio.pause();
+    jarvisAudio.currentTime = 0;
+    log("In-app audio stopped");
+    speak("Song stopped");
+  }
+
+  async function playSongOnYouTube(query) {
+    const idx = getSongByQuery(query);
+    if (idx >= 0) {
+      playSongByIndex(idx);
+      return true;
+    }
+
+    speak("Opening YouTube for " + query);
+    openUrl("https://www.youtube.com/results?search_query=" + encodeURIComponent(query));
+    return false;
+  }
+
+  function playSongOnSpotify(query) {
+    openUrl("https://open.spotify.com/search/" + encodeURIComponent(query));
+    speak("Opening Spotify for " + query);
+  }
+
+  function getMemories() {
+    return loadJson("jarvis_mems", []);
+  }
+
+  function setMemories(items) {
+    saveJson("jarvis_mems", items);
+  }
+
+  function renderMemories() {
+    if (!memList) return;
+    const mems = getMemories();
+    memList.innerHTML = "";
+    if (mems.length === 0) {
+      memList.textContent = "No memories saved";
+      return;
+    }
+
+    mems.slice().reverse().forEach((m, i) => {
+      const card = document.createElement("div");
+      card.style.padding = "6px";
+      card.style.borderBottom = "1px dashed rgba(255,255,255,.04)";
+      card.innerHTML = `
+        <strong style="color:#9ae6b4">${new Date(m.time).toLocaleString()}</strong>
+        <div style="margin-top:4px">${escapeHtml(m.text)}</div>
+        <div style="margin-top:6px">
+          <button class="smallbtn mem-del" data-i="${mems.length - 1 - i}">Delete</button>
+        </div>
+      `;
+      memList.appendChild(card);
+    });
+
+    memList.querySelectorAll(".mem-del").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const idx = Number(btn.getAttribute("data-i"));
+        const memsNow = getMemories();
+        memsNow.splice(idx, 1);
+        setMemories(memsNow);
+        renderMemories();
+        speak("Memory deleted");
+      });
+    });
+  }
+
+  function showMemories() {
+    renderMemories();
+    memList?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  function pushCommandHistory(cmd) {
+    commandHistory.unshift(cmd);
+    commandHistory = commandHistory.slice(0, 12);
+    saveJson("jarvis_command_history", commandHistory);
+    renderRecentCommands();
+  }
+
+  function renderRecentCommands() {
+    if (!recentCommands) return;
+    recentCommands.innerHTML = "";
+    if (!commandHistory.length) {
+      recentCommands.textContent = "No recent commands";
+      return;
+    }
+
+    commandHistory.forEach(cmd => {
+      const chip = document.createElement("span");
+      chip.className = "chip";
+      chip.textContent = cmd;
+      chip.addEventListener("click", () => {
+        if (cmdInput) cmdInput.value = cmd;
+        runCommandPipeline(cmd);
+      });
+      recentCommands.appendChild(chip);
+    });
+  }
+
+  function renderStats() {
+    if (statsBox) {
+      statsBox.innerHTML = `
+        <div><strong>Commands run:</strong> ${stats.commandsRun}</div>
+        <div style="margin-top:6px"><strong>Searches:</strong> ${stats.searches}</div>
+        <div style="margin-top:6px"><strong>Screenshots:</strong> ${stats.screenshots}</div>
+        <div style="margin-top:6px"><strong>Memories saved:</strong> ${stats.memoriesSaved}</div>
+        <div style="margin-top:6px"><strong>Jokes told:</strong> ${stats.jokesTold}</div>
+      `;
+    }
+    if (statCommandsMini) statCommandsMini.textContent = stats.commandsRun;
+    if (statMemoriesMini) statMemoriesMini.textContent = stats.memoriesSaved;
+  }
+
+  function saveStats() {
+    saveJson("jarvis_stats", stats);
+    renderStats();
+  }
+
+  function runBootSequence() {
+    if (!bootBar || !bootText || !bootPanel || !bootPercent) return;
+
+    const steps = [
+      "Booting core modules...",
+      "Loading Stark HUD overlays...",
+      "Starting neural voice engine...",
+      "Calibrating microphone array...",
+      "Syncing memory core...",
+      "Mounting assistant interface...",
+      "System ready."
+    ];
+
+    let i = 0;
+    bootBar.style.width = "0%";
+    bootPercent.textContent = "0%";
+    bootText.textContent = steps[0];
+
+    const id = setInterval(() => {
+      i++;
+      const pct = Math.min(100, Math.round((i / steps.length) * 100));
+      bootBar.style.width = pct + "%";
+      bootPercent.textContent = pct + "%";
+      bootText.textContent = steps[Math.min(i, steps.length - 1)];
+
+      if (i >= steps.length) {
+        clearInterval(id);
+        setTimeout(() => {
+          bootPanel.style.display = "none";
+        }, 900);
+      }
+    }, 520);
+  }
+
+  function applySavedTheme() {
+    const mode = localStorage.getItem("jarvis_theme") || "dark";
+    document.body.classList.toggle("light-mode", mode === "light");
+  }
+
+  function toggleTheme() {
+    const isLight = document.body.classList.toggle("light-mode");
+    localStorage.setItem("jarvis_theme", isLight ? "light" : "dark");
+    log("Theme set to " + (isLight ? "light" : "dark"));
+  }
+
+  async function startVoiceMeter() {
+    try {
+      if (!navigator.mediaDevices?.getUserMedia || !voiceMeterFill) return;
+      if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      meterSource = audioContext.createMediaStreamSource(stream);
+      analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+      meterSource.connect(analyser);
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+      const loop = () => {
+        analyser.getByteFrequencyData(dataArray);
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+        const avg = sum / dataArray.length;
+        const pct = Math.min(100, Math.round((avg / 255) * 100));
+        voiceMeterFill.style.width = pct + "%";
+        meterRaf = requestAnimationFrame(loop);
+      };
+
+      meterRaf = requestAnimationFrame(loop);
+    } catch {}
+  }
+
+  function stopVoiceMeter() {
+    if (meterRaf) {
+      cancelAnimationFrame(meterRaf);
+      meterRaf = null;
+    }
+    if (meterSource?.mediaStream) {
+      meterSource.mediaStream.getTracks().forEach(t => t.stop());
+      try { meterSource.disconnect(); } catch {}
+    }
+    if (analyser) {
+      try { analyser.disconnect(); } catch {}
+      analyser = null;
+    }
+    if (voiceMeterFill) voiceMeterFill.style.width = "0%";
+  }
+
+  function setupRecognition() {
+    if (!SpeechRecognition) {
+      if (listenStatus) listenStatus.textContent = "SpeechRecognition not supported";
+      if (btnStart) btnStart.disabled = true;
+      if (btnStop) btnStop.disabled = true;
+      log("Speech recognition API not supported", "err");
+      return;
+    }
+
+    recognition = new SpeechRecognition();
+    recognition.lang = lang;
+    recognition.interimResults = false;
+    recognition.continuous = chkContinuous?.checked || false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      listening = true;
+      setListeningUI(true);
+      log("Voice recognition started");
+      startVoiceMeter();
+    };
+
+    recognition.onend = () => {
+      listening = false;
+      setListeningUI(false);
+      stopVoiceMeter();
+      log("Voice recognition stopped");
+
+      if (chkContinuous?.checked && recognition && !manuallyStopped) {
+        setTimeout(() => {
+          try { recognition.start(); } catch {}
+        }, 250);
+      }
+    };
+
+    recognition.onerror = ev => {
+      log("Speech error: " + ev.error, "err");
+      stopVoiceMeter();
+    };
+
+    recognition.onresult = ev => {
+      const res = ev.results[ev.results.length - 1][0].transcript.trim();
+      addTranscriptEntry("User: " + res);
+      log("Heard: " + res);
+
+      const lower = res.toLowerCase();
+      const wakePattern = new RegExp(`^.*?(${customWake.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}|hey jarvis|ok jarvis)[, ]*`, "i");
+
+      if (chkWakeReq?.checked) {
+        if (wakePattern.test(lower)) {
+          const stripped = res.replace(wakePattern, "").trim();
+          if (stripped) runCommandPipeline(stripped);
+          else speak("Yes?");
+        } else {
+          log("Ignored — wake phrase required");
+        }
+        return;
+      }
+
+      if (wakeWordOn && wakePattern.test(lower)) {
+        const stripped = res.replace(wakePattern, "").trim();
+        if (stripped) runCommandPipeline(stripped);
+        else speak("Yes?");
+        return;
+      }
+
+      runCommandPipeline(res);
+    };
+  }
+
+  function handleExtraCommand(raw) {
+    const lower = raw.toLowerCase().trim();
+
+    if (/^(power\s*off( phone)?|shutdown( phone)?)$/.test(lower)) { powerOffAnimation(); return true; }
+    if (/^(restart( phone)?|reboot( phone)?)$/.test(lower)) { restartAnimation(); return true; }
+    if (/^(flashlight|torch) on$/.test(lower)) { flashlight(true); return true; }
+    if (/^(flashlight|torch) off$/.test(lower)) { flashlight(false); return true; }
+    if (/^open camera$/.test(lower)) { openCamera(); return true; }
+    if (/^close camera$/.test(lower)) { closeCamera(); return true; }
+    if (/^open whatsapp$/.test(lower)) { openWhatsApp(); return true; }
+    if (/^open gallery$/.test(lower)) { openGallery(); return true; }
+    if (/^battery status$/.test(lower)) { batteryStatus(); return true; }
+    if (/^device info$/.test(lower)) { deviceInfo(); return true; }
+    if (/^keep screen on$/.test(lower)) { keepScreenOn(); return true; }
+    if (/^allow sleep$/.test(lower)) { allowSleep(); return true; }
+    if (/^vibrate$/.test(lower)) { vibrate(); return true; }
+    if (/^lock screen$/.test(lower)) { lockScreen(); return true; }
+    if (/^unlock screen$/.test(lower)) { unlockScreen(); return true; }
+    if (/^news$/.test(lower)) { openNews(); return true; }
+    if (/^weather$/.test(lower)) { openUrl("https://wttr.in/?format=3"); return true; }
+    if (/^play spotify$/.test(lower)) { openUrl("https://open.spotify.com/collection/playlists"); return true; }
+    if (/^screenshot$/.test(lower)) { takeScreenshot(); return true; }
+    if (/^motivate$/.test(lower)) { speak(quotes[Math.floor(Math.random() * quotes.length)]); return true; }
+    if (/^self destruct$/.test(lower)) { runSelfDestruct(); return true; }
+
+    return false;
+  }
+
+  function runCommandPipeline(text) {
+    let cleaned = normalizeCommand(text);
+    if (!cleaned) return;
+
+    cleaned = normalizeHindiAliases(cleaned);
+
+    stats.commandsRun++;
+    saveStats();
+    pushCommandHistory(cleaned);
+
+    if (handleExtraCommand(cleaned)) return;
+    handleCommand(cleaned);
+  }
+
+  async function handleCommand(textRaw) {
+    const text = textRaw.trim();
+    if (!text) return;
+    const lower = text.toLowerCase();
+
+    if (/^(hi|hello|hey|hey jarvis|ok jarvis)\b/.test(lower)) {
+      speak("Hello. How can I help?");
+      addTranscriptEntry("Jarvis: Hello. How can I help?");
+      return;
+    }
+
+    if (lower === "next song") {
+      playNextSong();
+      return;
+    }
+
+    if (lower === "previous song") {
+      playPreviousSong();
+      return;
+    }
+
+    if (lower === "pause song") {
+      jarvisAudio?.pause();
+      speak("Song paused");
+      return;
+    }
+
+    if (lower === "resume song") {
+      jarvisAudio?.play();
+      speak("Resuming song");
+      return;
+    }
+
+    if (lower === "like song") {
+      toggleLikeSong();
+      return;
+    }
+
+    if (/^play\s+/i.test(text)) {
+      const query = text.replace(/^play\s+/i, "").trim();
+
+      if (!query) {
+        speak("Please tell me the song name");
+        return;
+      }
+
+      if (/on spotify|in spotify/i.test(text)) {
+        playSongOnSpotify(query.replace(/\s+on spotify|\s+in spotify/i, "").trim());
+        return;
+      }
+
+      await playSongOnYouTube(query.replace(/\s+on youtube|\s+in youtube/i, "").trim());
+      return;
+    }
+
+    if (lower.includes("time")) {
+      const out = `It is ${new Date().toLocaleTimeString()}`;
+      speak(out);
+      addTranscriptEntry("Jarvis: " + out);
+      return;
+    }
+
+    if (lower.includes("date")) {
+      const out = `Today is ${new Date().toLocaleDateString()}`;
+      speak(out);
+      addTranscriptEntry("Jarvis: " + out);
+      return;
+    }
+
+    if (/\bopen (youtube|google|wikipedia|github|spotify|maps)\b/.test(lower)) {
+      let site = "https://google.com";
+      if (lower.includes("youtube")) site = "https://youtube.com";
+      else if (lower.includes("wikipedia")) site = "https://wikipedia.org";
+      else if (lower.includes("github")) site = "https://github.com";
+      else if (lower.includes("spotify")) site = "https://open.spotify.com";
+      else if (lower.includes("maps")) site = "https://maps.google.com";
+
+      speak("Opening " + site.replace(/^https?:\/\//, ""));
+      openUrl(site);
+      addTranscriptEntry("Jarvis: opening " + site);
+      return;
+    }
+
+    if (lower.startsWith("search ") || lower.startsWith("google ")) {
+      const q = text.replace(/^(search|google)\s+/i, "").trim();
+      if (!q) {
+        speak("What do you want me to search?");
+        return;
+      }
+      stats.searches++;
+      saveStats();
+      speak("Searching Google for " + q);
+      openUrl("https://www.google.com/search?q=" + encodeURIComponent(q));
+      addTranscriptEntry("Jarvis: searched for " + q);
+      return;
+    }
+
+    if (lower.startsWith("wiki ") || lower.startsWith("wikipedia ")) {
+      const term = text.replace(/^(wiki|wikipedia)\s+/i, "").trim();
+      if (!term) {
+        speak("What do you want from Wikipedia?");
+        return;
+      }
+
+      speak("Searching Wikipedia for " + term);
+      addTranscriptEntry("Jarvis: fetching Wikipedia for " + term);
+
+      try {
+        const api = "https://en.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(term);
+        const r = await fetch(api);
+        if (!r.ok) {
+          speak("No Wikipedia page found for " + term);
+          return;
+        }
+        const j = await r.json();
+        const extract = j.extract
+          ? j.extract.split(". ").slice(0, 2).join(". ") + "."
+          : "No summary available.";
+
+        speak(extract);
+        addTranscriptEntry("Wiki: " + extract);
+      } catch (e) {
+        speak("Failed to fetch Wikipedia.");
+        addTranscriptEntry("Wiki error: " + e.message, "err");
+      }
+      return;
+    }
+
+    if (
+      lower.startsWith("calculate ") ||
+      lower.startsWith("what is ") ||
+      /^[0-9+\-*/(). %]+$/.test(lower)
+    ) {
+      const expr = text
+        .replace(/^(calculate|what is)\s+/i, "")
+        .replace(/[^0-9+\-*/(). %]/g, "");
+
+      if (!expr) {
+        speak("I could not parse the expression");
+        return;
+      }
+
+      try {
+        const val = Function(`"use strict"; return (${expr})`)();
+        speak("The result is " + val);
+        addTranscriptEntry("Calc: " + expr + " = " + val);
+      } catch (e) {
+        speak("Sorry, cannot calculate that.");
+        addTranscriptEntry("Calc error: " + e.message, "err");
+      }
+      return;
+    }
+
+    if (lower.startsWith("set timer") || lower.startsWith("timer ")) {
+      const m = lower.match(/(\d+)\s*(seconds|second|minutes|minute|secs|mins)?/);
+      if (!m) {
+        speak("Please tell me the time in seconds or minutes");
+        return;
+      }
+
+      const num = parseInt(m[1], 10);
+      const unit = (m[2] || "seconds").toLowerCase();
+      const ms = unit.startsWith("min") ? num * 60 * 1000 : num * 1000;
+
+      speak(`Timer set for ${num} ${unit.startsWith("min") ? "minutes" : "seconds"}`);
+      addTranscriptEntry(`Timer: ${num} ${unit}`);
+
+      setTimeout(() => {
+        speak(`Timer finished: ${num} ${unit.startsWith("min") ? "minutes" : "seconds"}`);
+        alert(`Timer finished: ${num} ${unit}`);
+      }, ms);
+      return;
+    }
+
+    if (lower.includes("joke")) {
+      const joke = jokes[Math.floor(Math.random() * jokes.length)];
+      stats.jokesTold++;
+      saveStats();
+      speak(joke);
+      addTranscriptEntry("Joke: " + joke);
+      return;
+    }
+
+    if (lower.includes("motivate") || lower.includes("motivation") || lower.includes("quote")) {
+      const q = quotes[Math.floor(Math.random() * quotes.length)];
+      speak(q);
+      addTranscriptEntry("Quote: " + q);
+      return;
+    }
+
+    if (lower.includes("weather")) {
+      const m = text.match(/weather in (.+)$/i);
+      const place = m ? m[1].trim() : "";
+      if (place) {
+        speak("Opening weather for " + place);
+        openUrl("https://wttr.in/" + encodeURIComponent(place));
+      } else {
+        speak("Opening weather report");
+        openUrl("https://wttr.in/?format=3");
+      }
+      return;
+    }
+
+    if (lower.startsWith("translate ")) {
+      const m = text.match(/^translate\s+(.+?)\s+to\s+([a-zA-Z\-]+)/i);
+      if (m) {
+        const phrase = m[1];
+        const target = m[2];
+        speak("Translating to " + target);
+        openUrl(
+          "https://translate.google.com/?sl=auto&tl=" +
+          encodeURIComponent(target) +
+          "&text=" +
+          encodeURIComponent(phrase) +
+          "&op=translate"
+        );
+      } else {
+        speak("Opening Google Translate");
+        openUrl("https://translate.google.com");
+      }
+      return;
+    }
+
+    if (lower.startsWith("remember ")) {
+      const mem = text.replace(/^remember\s+/i, "").trim();
+      if (mem) {
+        const mems = getMemories();
+        mems.push({ text: mem, time: Date.now() });
+        setMemories(mems);
+        stats.memoriesSaved++;
+        saveStats();
+        speak("Done. I will remember: " + mem);
+        addTranscriptEntry("Memory saved: " + mem);
+        renderMemories();
+      } else {
+        speak("What should I remember?");
+      }
+      return;
+    }
+
+    if (
+      lower.includes("what do you remember") ||
+      lower.includes("list memories") ||
+      lower.includes("what did i ask you to remember")
+    ) {
+      const mems = getMemories();
+      if (mems.length === 0) {
+        speak("You have no saved memories.");
+        return;
+      }
+      speak(`You asked me to remember ${mems.length} items. I will show them now.`);
+      renderMemories();
+      showMemories();
+      return;
+    }
+
+    if (lower.includes("screenshot") || lower.includes("screen shot") || lower.includes("capture screen")) {
+      takeScreenshot();
+      return;
+    }
+
+    if (lower.includes("power off") || lower.includes("shutdown")) { powerOffAnimation(); return; }
+    if (lower.includes("restart")) { restartAnimation(); return; }
+    if (lower.includes("flashlight on") || lower.includes("torch on")) { flashlight(true); return; }
+    if (lower.includes("flashlight off") || lower.includes("torch off")) { flashlight(false); return; }
+    if (lower.includes("open camera") || lower.includes("show camera")) { openCamera(); return; }
+    if (lower.includes("close camera") || lower.includes("hide camera")) { closeCamera(); return; }
+    if (lower.includes("whatsapp")) { openWhatsApp(); speak("Opening WhatsApp"); return; }
+    if (lower.includes("gallery")) { openGallery(); return; }
+    if (lower.includes("keep screen on") || lower.includes("stay awake")) { keepScreenOn(); return; }
+    if (lower.includes("allow sleep")) { allowSleep(); return; }
+    if (lower.includes("vibrate")) { vibrate(); return; }
+    if (lower.includes("lock screen")) { lockScreen(); return; }
+    if (lower.includes("unlock screen")) { unlockScreen(); return; }
+    if (lower.includes("news") || lower.includes("top news")) { openNews(); return; }
+
+    if (lower.includes("physics wallah") || lower.includes("open pw") || lower.includes("play pw")) {
+      speak("Opening Physics Wallah");
+      try {
+        window.location.href = "intent://#Intent;package=in.eduwall.pwclassroom;scheme=pw;end";
+      } catch {}
+      setTimeout(() => openUrl("https://www.pw.live/"), 800);
+      return;
+    }
+
+    speak("I did not understand. Do you want me to search the web?");
+    if (confirm(`Search web for "${text}"?`)) {
+      stats.searches++;
+      saveStats();
+      openUrl("https://www.google.com/search?q=" + encodeURIComponent(text));
+    }
+  }
+
+  async function openCamera() {
+    try {
+      cameraOverlay.style.display = "flex";
+      if (camStream) {
+        camStream.getTracks().forEach(t => t.stop());
+        camStream = null;
+      }
+      camStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: usingBackCam ? { ideal: "environment" } : "user" },
+        audio: false
+      });
+      camVideo.srcObject = camStream;
+      log("Camera opened");
+    } catch (e) {
+      log("Camera error: " + e.message, "err");
+      alert("Camera permission or device error.");
+    }
+  }
+
+  function closeCamera() {
+    cameraOverlay.style.display = "none";
+    if (camStream) {
+      camStream.getTracks().forEach(t => t.stop());
+      camStream = null;
+    }
+    log("Camera closed");
+  }
+
+  function flashlight(on) {
+    flashlightOverlay.style.display = on ? "flex" : "none";
+    flashlightOverlay.style.background = on ? "#ffffff" : "transparent";
+    log("Flashlight " + (on ? "on" : "off"));
+  }
+
+  async function batteryStatus() {
+    try {
+      if (!("getBattery" in navigator)) {
+        alert("Battery API not supported");
+        return;
+      }
+      const b = await navigator.getBattery();
+      const pct = Math.round(b.level * 100);
+      const charging = b.charging ? "charging" : "not charging";
+      alert(`Battery: ${pct}% (${charging})`);
+      log(`Battery status: ${pct}% (${charging})`);
+    } catch (e) {
+      log("Battery error: " + e.message, "err");
+    }
+  }
+
+  function deviceInfo() {
+    const info = `UA: ${navigator.userAgent}\nPlatform: ${navigator.platform}\nLanguage: ${navigator.language}`;
+    alert(info);
+    log("Device info shown");
+  }
+
+  async function keepScreenOn() {
+    try {
+      if ("wakeLock" in navigator) {
+        wakeLock = await navigator.wakeLock.request("screen");
+        log("Wake Lock active (screen on)");
+      } else {
+        alert("Wake Lock API not supported in this browser");
+      }
+    } catch (e) {
+      log("Wake Lock error: " + e.message, "err");
+    }
+  }
+
+  function allowSleep() {
+    if (wakeLock) {
+      try { wakeLock.release(); } catch {}
+      wakeLock = null;
+      log("Wake Lock released");
+    }
+  }
+
+  function vibrate() {
+    if ("vibrate" in navigator) {
+      navigator.vibrate([60, 40, 60, 40, 120]);
+      log("Vibration pattern played");
+    } else {
+      alert("Vibration not supported on this device");
+    }
+  }
+
+  function lockScreen() {
+    lockOverlay.style.display = "flex";
+    log("Screen locked (UI)");
+  }
+
+  function unlockScreen() {
+    lockOverlay.style.display = "none";
+    log("Screen unlocked (UI)");
+  }
+
+  function openWhatsApp() {
+    try {
+      window.location.href = "intent://send/#Intent;scheme=whatsapp;package=com.whatsapp;end";
+      setTimeout(() => openUrl("https://web.whatsapp.com"), 800);
+    } catch {
+      openUrl("https://web.whatsapp.com");
+    }
+    log("WhatsApp request");
+  }
+
+  function openGallery() {
+    openUrl("https://photos.google.com");
+    log("Gallery opened");
+  }
+
+  function powerOffAnimation() {
+    powerOverlay.style.display = "flex";
+    restartText.textContent = "Powering off...";
+    setTimeout(() => { document.body.style.filter = "brightness(0)"; }, 600);
+    log("Simulated power off");
+  }
+
+  function restartAnimation() {
+    powerOverlay.style.display = "flex";
+    restartText.textContent = "Restarting...";
+    setTimeout(() => { document.body.style.filter = "brightness(0)"; }, 600);
+    setTimeout(() => {
+      document.body.style.filter = "";
+      powerOverlay.style.display = "none";
+      log("Simulated restart finished");
+    }, 3200);
+    log("Simulated restart");
+  }
+
+  async function takeScreenshot() {
+    alert("Screenshot feature needs html2canvas if you want full-page capture.");
+    log("Screenshot requested");
+  }
+
+  function runSelfDestruct() {
+    const c = boomCanvas;
+    if (!c) return;
+    c.width = window.innerWidth;
+    c.height = window.innerHeight;
+    c.style.display = "block";
+    const ctx = c.getContext("2d");
+    const sparks = [];
+
+    for (let i = 0; i < 220; i++) {
+      sparks.push({
+        x: window.innerWidth / 2 + (Math.random() - 0.5) * 200,
+        y: window.innerHeight / 2 + (Math.random() - 0.5) * 200,
+        vx: (Math.random() - 0.5) * 14,
+        vy: (Math.random() - 0.9) * 14 - 4,
+        r: Math.random() * 6 + 2,
+        life: Math.random() * 100 + 40,
+        color: `rgba(${200 + Math.floor(Math.random() * 55)},${Math.floor(Math.random() * 140)},0,`
       });
     }
 
-    (() => {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      const synth = window.speechSynthesis;
+    let t = 0;
+    speak("Self destruct in 3... 2... 1...");
+    const originalTransform = document.body.style.transform || "";
 
-      const btnStart = document.getElementById("btnStart");
-      const btnStop = document.getElementById("btnStop");
-      const btnSend = document.getElementById("btnSend");
-      const cmdInput = document.getElementById("cmdInput");
-      const transcriptEl = document.getElementById("transcript");
-      const logEl = document.getElementById("log");
-      const listenStatus = document.getElementById("listenStatus");
-      const listenDot = document.getElementById("listenDot");
-      const chkVoice = document.getElementById("chkVoice");
-      const chkContinuous = document.getElementById("chkContinuous");
-      const chkWakeReq = document.getElementById("chkWakeReq");
-      const btnWake = document.getElementById("btnWake");
-      const wakeState = document.getElementById("wakeState");
-      const wakeInput = document.getElementById("wakeInput");
-      const btnSaveWake = document.getElementById("btnSaveWake");
-      const voiceSelect = document.getElementById("voiceSelect");
-      const langSelect = document.getElementById("langSelect");
-      const langLabel = document.getElementById("langLabel");
+    const id = setInterval(() => {
+      ctx.fillStyle = "rgba(0,0,0,.12)";
+      ctx.fillRect(0, 0, c.width, c.height);
 
-      const btnPlayYT = document.getElementById("btnPlayYT");
-      const btnPlaySP = document.getElementById("btnPlaySP");
-      const btnStopAudio = document.getElementById("btnStopAudio");
-      const btnStartSong = document.getElementById("btnStartSong");
-      const btnPrevSong = document.getElementById("btnPrevSong");
-      const btnNextSong = document.getElementById("btnNextSong");
-      const btnLikeSong = document.getElementById("btnLikeSong");
-      const btnPlayPauseSong = document.getElementById("btnPlayPauseSong");
-      const musicInput = document.getElementById("musicInput");
-      const jarvisAudio = document.getElementById("jarvisAudio");
-      const nowPlayingText = document.getElementById("nowPlayingText");
-      const playerSongTitle = document.getElementById("playerSongTitle");
-      const playerSongMeta = document.getElementById("playerSongMeta");
-      const likedBadge = document.getElementById("likedBadge");
-      const playlistBox = document.getElementById("playlistBox");
-      const likedSongsBox = document.getElementById("likedSongsBox");
+      sparks.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.18;
+        p.life--;
+        ctx.beginPath();
+        ctx.fillStyle = p.color + (p.life / 140) + ")";
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
 
-      const powerOverlay = document.getElementById("powerOverlay");
-      const restartText = document.getElementById("restartText");
-      const flashlightOverlay = document.getElementById("flashlightOverlay");
-      const lockOverlay = document.getElementById("lockOverlay");
-      const unlockBtn = document.getElementById("unlockBtn");
+      t++;
+      if (t % 6 === 0) {
+        document.body.style.transform = `translate(${(Math.random() - 0.5) * 8}px, ${(Math.random() - 0.5) * 8}px)`;
+      }
 
-      const cameraOverlay = document.getElementById("cameraOverlay");
-      const camVideo = document.getElementById("camVideo");
-      const btnCloseCamera = document.getElementById("btnCloseCamera");
-      const btnSwitchCamera = document.getElementById("btnSwitchCamera");
-      const btnCameraSnap = document.getElementById("btnCameraSnap");
-
-      const btnWeather = document.getElementById("btnWeather");
-      const btnNews = document.getElementById("btnNews");
-      const btnQuote = document.getElementById("btnQuote");
-      const btnTranslate = document.getElementById("btnTranslate");
-      const btnScreenshot = document.getElementById("btnScreenshot");
-      const btnSpotify = document.getElementById("btnSpotify");
-      const btnSelfDestruct = document.getElementById("btnSelfDestruct");
-      const boomCanvas = document.getElementById("boomCanvas");
-      const btnRPS = document.getElementById("btnRPS");
-      const btnGuess = document.getElementById("btnGuess");
-
-      const memInput = document.getElementById("memInput");
-      const memAdd = document.getElementById("memAdd");
-      const memList = document.getElementById("memList");
-      const btnSaveMemory = document.getElementById("btnSaveMemory");
-      const btnShowMemory = document.getElementById("btnShowMemory");
-
-      const btnFaceCapture = document.getElementById("btnFaceCapture");
-      const btnFaceLogin = document.getElementById("btnFaceLogin");
-      const faceStatus = document.getElementById("faceStatus");
-      const facePreview = document.getElementById("facePreview");
-
-      const btnThemeToggle = document.getElementById("btnThemeToggle");
-      const btnVoiceTest = document.getElementById("btnVoiceTest");
-      const btnClearMemories = document.getElementById("btnClearMemories");
-      const btnInstallApp = document.getElementById("btnInstallApp");
-      const btnInstallAppBanner = document.getElementById("btnInstallAppBanner");
-      const btnDismissInstall = document.getElementById("btnDismissInstall");
-      const installBanner = document.getElementById("installBanner");
-      const bootPanel = document.getElementById("bootPanel");
-      const bootText = document.getElementById("bootText");
-      const bootBar = document.getElementById("bootBar");
-      const bootPercent = document.getElementById("bootPercent");
-      const jarvisOrb = document.getElementById("jarvisOrb");
-      const recentCommands = document.getElementById("recentCommands");
-      const statsBox = document.getElementById("statsBox");
-      const statCommandsMini = document.getElementById("statCommandsMini");
-      const statMemoriesMini = document.getElementById("statMemoriesMini");
-      const voiceMeterFill = document.getElementById("voiceMeter")?.firstElementChild;
-
-      let recognition = null;
-      let listening = false;
-      let manuallyStopped = false;
-      let wakeWordOn = false;
-      let customWake = (localStorage.getItem("jarvis_wake") || "hey jarvis").trim().toLowerCase();
-      let lang = "en-US";
-      let availableVoices = [];
-      let camStream = null;
-      let usingBackCam = true;
-      let wakeLock = null;
-      let deferredPrompt = null;
-      let faceDataUrl = localStorage.getItem("jarvis_face") || null;
-      let audioContext = null;
-      let analyser = null;
-      let meterSource = null;
-      let meterRaf = null;
-
-      const songsLibrary = [
-
-  {
-    id: "bahubali",
-    title: "Jiyo Re Bahubali",
-    artist: "Jarvis Local Music",
-    file: "songs/01 Jiyo Re Bahubali - Bahubali 2 - 320Kbps.mp3",
-    aliases: ["bahubali", "jiyo re bahubali"]
-  },
-
-  {
-    id: "chammak",
-    title: "Chammak Challo",
-    artist: "Jarvis Local Music",
-    file: "songs/01. Chammak Challo.mp3",
-    aliases: ["chammak", "chammak challo"]
-  },
-
-  {
-    id: "akh-lad-jave",
-    title: "Akh Lad Jave",
-    artist: "Jarvis Local Music",
-    file: "songs/02 Akh Lad Jave - Loveratri.mp3",
-    aliases: ["akh lad jave", "akh lad"]
-  },
-
-  {
-    id: "jitni-dafa",
-    title: "Jitni Dafa",
-    artist: "Jarvis Local Music",
-    file: "songs/02 Jitni Dafa - Parmanu 320Kbps (3).mp3",
-    aliases: ["jitni dafa"]
-  },
-
-  {
-    id: "chand",
-    title: "Chand Sifarish",
-    artist: "Jarvis Local Music",
-    file: "songs/02. Chand Sifarish.mp3",
-    aliases: ["chand sifarish", "chand"]
-  },
-
-  {
-    id: "tere-liye",
-    title: "Tere Liye",
-    artist: "Jarvis Local Music",
-    file: "songs/02. Tere Liye.mp3",
-    aliases: ["tere liye"]
-  },
-
-  {
-    id: "teri-masumiyat",
-    title: "Teri Masumiyat",
-    artist: "Jarvis Local Music",
-    file: "songs/04 Teri Masumiyat - Bezubaan Ishq.mp3",
-    aliases: ["teri masumiyat"]
-  },
-
-  {
-    id: "intkam",
-    title: "Mera Intkam Dekhegi",
-    artist: "Jarvis Local Music",
-    file: "songs/05 Mera Intkam Dekhegi.mp3",
-    aliases: ["intkam", "mera intkam dekhegi"]
-  },
-
-  {
-    id: "jaanam",
-    title: "Jaanam",
-    artist: "Jarvis Local Music",
-    file: "songs/128-Jaanam - Bad Newz 128 Kbps.mp3",
-    aliases: ["jaanam"]
-  },
-
-  {
-    id: "shambhu",
-    title: "Har Har Shambhu Shiv Mahadeva",
-    artist: "Jarvis Local Music",
-    file: "songs/Har Har Shambhu Shiv Mahadeva.mp3",
-    aliases: ["shambhu", "har har shambhu", "mahadev"]
-  },
-
-  {
-    id: "aashiqui",
-    title: "Tu Hi Hai Aashiqui",
-    artist: "Jarvis Local Music",
-    file: "songs/Tu Hi Hai Aashiqui.mp3",
-    aliases: ["aashiqui", "tu hi hai", "tu hi hai aashiqui"]
+      if (t > 160) {
+        clearInterval(id);
+        ctx.clearRect(0, 0, c.width, c.height);
+        c.style.display = "none";
+        document.body.style.transform = originalTransform;
+        log("Self-destruct animation done");
+      }
+    }, 16);
   }
 
-];
+  function playRPS() {
+    const choices = ["rock", "paper", "scissors"];
+    const user = prompt("Choose rock, paper or scissors:");
+    if (!user) return;
+    const u = user.toLowerCase();
+    if (!choices.includes(u)) { alert("Invalid choice"); return; }
+    const bot = choices[Math.floor(Math.random() * 3)];
+    let res = "Draw";
+    if ((u === "rock" && bot === "scissors") || (u === "paper" && bot === "rock") || (u === "scissors" && bot === "paper")) res = "You win!";
+    else if (u !== bot) res = "You lose!";
+    speak(`You chose ${u}. I chose ${bot}. ${res}`);
+    alert(`You: ${u}\nJarvis: ${bot}\n\n${res}`);
+  }
 
-      let currentSongIndex = -1;
-      let likedSongs = loadJson("jarvis_liked_songs", []);
+  function playGuess() {
+    const target = Math.floor(Math.random() * 50) + 1;
+    let tries = 0;
+    let ok = false;
 
-      const jokes = [
-        "Why did the developer go broke? Because he used up all his cache.",
-        "Why do programmers prefer dark mode? Because the light attracts bugs.",
-        "I told my computer I needed a break, and it said: no problem, I will go to sleep."
-      ];
+    while (tries < 7) {
+      const g = prompt("Guess the number (1-50). Attempts left: " + (7 - tries));
+      if (g === null) return;
+      const n = parseInt(g, 10);
+      if (Number.isNaN(n)) { alert("Enter a number"); continue; }
+      tries++;
+      if (n === target) {
+        speak("Correct!");
+        alert("Correct! The number was " + target);
+        ok = true;
+        break;
+      } else if (n < target) {
+        speak("Higher");
+        alert("Higher");
+      } else {
+        speak("Lower");
+        alert("Lower");
+      }
+    }
 
-      const quotes = [
-        "The best time to plant a tree was 20 years ago. The second best time is now.",
-        "Do not watch the clock; do what it does. Keep going.",
-        "Discipline beats motivation when motivation goes missing."
-      ];
+    if (!ok) {
+      speak("Out of attempts. The number was " + target);
+      alert("Out of attempts. The number was " + target);
+    }
+  }
 
-      let commandHistory = loadJson("jarvis_command_history", []);
-      let stats = loadJson("jarvis_stats", {
-        commandsRun: 0,
-        searches: 0,
-        screenshots: 0,
-        memoriesSaved: 0,
-        jokesTold: 0
+  async function computeImageDiff(aDataUrl, bDataUrl) {
+    function loadImage(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
       });
-
-      function escapeHtml(s) {
-        return String(s).replace(/[&<>"']/g, m => ({
-          "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-        }[m]));
-      }
-
-      function log(message, type = "info") {
-        const time = new Date().toLocaleTimeString();
-        const el = document.createElement("div");
-        const tone = type === "err" ? "#ffb4b4" : "#d7e7ff";
-        const stamp = type === "err" ? "#ff997f" : "#9ae6b4";
-        el.innerHTML = `<strong style="color:${stamp}">${time}</strong> — <span style="color:${tone}">${escapeHtml(message)}</span>`;
-        logEl?.prepend(el);
-      }
-
-      function saveJson(key, value) {
-        localStorage.setItem(key, JSON.stringify(value));
-      }
-
-      function loadJson(key, fallback) {
-        try {
-          const raw = localStorage.getItem(key);
-          return raw ? JSON.parse(raw) : fallback;
-        } catch {
-          return fallback;
-        }
-      }
-
-      function setListeningUI(isLive) {
-        if (listenStatus) listenStatus.textContent = isLive ? "Listening..." : "Idle";
-        if (listenDot) listenDot.classList.toggle("live", isLive);
-        if (btnStart) btnStart.textContent = isLive ? "Listening" : "Start Listening";
-      }
-
-      function addTranscriptEntry(txt, type = "sys") {
-        if (!transcriptEl) return;
-        const p = document.createElement("div");
-        p.style.marginTop = "8px";
-        p.style.fontSize = "14px";
-        p.style.color = type === "err" ? "#ffb3b3" : "#dbeafe";
-        p.textContent = txt;
-        transcriptEl.appendChild(p);
-        transcriptEl.scrollTop = transcriptEl.scrollHeight;
-      }
-
-      function openUrl(url) {
-        const win = window.open(url, "_blank");
-        if (!win) window.location.href = url;
-      }
-
-      function populateVoices() {
-        if (!synth || !voiceSelect) return;
-        availableVoices = synth.getVoices() || [];
-        voiceSelect.innerHTML = "";
-
-        if (!availableVoices.length) {
-          const opt = document.createElement("option");
-          opt.value = "";
-          opt.textContent = "Default browser voice";
-          voiceSelect.appendChild(opt);
-          return;
-        }
-
-        availableVoices.forEach((voice, i) => {
-          const opt = document.createElement("option");
-          opt.value = String(i);
-          opt.textContent = `${voice.name} — ${voice.lang}${voice.default ? " (default)" : ""}`;
-          voiceSelect.appendChild(opt);
-        });
-
-        const saved = localStorage.getItem("jarvis_voice_index");
-        if (saved && availableVoices[Number(saved)]) {
-          voiceSelect.value = saved;
-        }
-      }
-
-      if (synth) {
-        populateVoices();
-        if (speechSynthesis.onvoiceschanged !== undefined) {
-          speechSynthesis.onvoiceschanged = populateVoices;
-        }
-      }
-
-      function speak(text) {
-        if (!chkVoice?.checked) return;
-        if (!synth) return;
-
-        try {
-          synth.cancel();
-          const utter = new SpeechSynthesisUtterance(text);
-          utter.lang = lang;
-
-          const selectedIndex = Number(voiceSelect?.value);
-          if (!Number.isNaN(selectedIndex) && availableVoices[selectedIndex]) {
-            utter.voice = availableVoices[selectedIndex];
-            utter.lang = availableVoices[selectedIndex].lang || lang;
-          }
-
-          synth.speak(utter);
-          log("Jarvis: " + text);
-        } catch (err) {
-          log("Speech failed: " + err.message, "err");
-        }
-      }
-
-      function unlockSpeech() {
-        try {
-          const u = new SpeechSynthesisUtterance(" ");
-          u.volume = 0;
-          synth?.speak(u);
-          synth?.cancel();
-        } catch {}
-      }
-
-      function normalizeCommand(text) {
-        return text.trim();
-      }
-
-      function normalizeHindiAliases(text) {
-        const cleaned = text.trim();
-
-        if (/^gaana chalao /i.test(cleaned)) return cleaned.replace(/^gaana chalao /i, "play ");
-        if (/^song chalao /i.test(cleaned)) return cleaned.replace(/^song chalao /i, "play ");
-        if (/^gaana bajao /i.test(cleaned)) return cleaned.replace(/^gaana bajao /i, "play ");
-        if (/^youtube pe /i.test(cleaned)) return cleaned.replace(/^youtube pe /i, "play ") + " on youtube";
-        if (/^spotify pe /i.test(cleaned)) return cleaned.replace(/^spotify pe /i, "play ") + " on spotify";
-        if (/^(samay|time batao|kitna baje)$/i.test(cleaned)) return "time";
-        if (/^(date batao|aaj ki date)$/i.test(cleaned)) return "date";
-        if (/^(news kholo|top news)$/i.test(cleaned)) return "news";
-        if (/^(mausam|weather batao)$/i.test(cleaned)) return "weather";
-        if (/^(agla gana|next gana)$/i.test(cleaned)) return "next song";
-        if (/^(pichla gana|previous gana)$/i.test(cleaned)) return "previous song";
-        if (/^(gana pause karo)$/i.test(cleaned)) return "pause song";
-        if (/^(gana chalu karo|resume gana)$/i.test(cleaned)) return "resume song";
-        if (/^(gana like karo)$/i.test(cleaned)) return "like song";
-
-        return cleaned;
-      }
-
-      function getSongByQuery(query) {
-        const q = query.toLowerCase().trim();
-
-        for (let i = 0; i < songsLibrary.length; i++) {
-          const song = songsLibrary[i];
-          if (song.aliases.some(alias => alias === q)) return i;
-        }
-
-        for (let i = 0; i < songsLibrary.length; i++) {
-          const song = songsLibrary[i];
-          if (song.aliases.some(alias => alias.includes(q) || q.includes(alias))) return i;
-        }
-
-        return -1;
-      }
-
-      function updateNowPlayingUI() {
-        if (currentSongIndex < 0 || !songsLibrary[currentSongIndex]) {
-          if (nowPlayingText) nowPlayingText.textContent = "No song playing";
-          if (playerSongTitle) playerSongTitle.textContent = "Nothing selected";
-          if (playerSongMeta) playerSongMeta.textContent = "Jarvis Local Music System";
-          if (likedBadge) likedBadge.textContent = "♡ Not liked";
-          return;
-        }
-
-        const song = songsLibrary[currentSongIndex];
-        if (nowPlayingText) nowPlayingText.textContent = `Now Playing: ${song.title}`;
-        if (playerSongTitle) playerSongTitle.textContent = song.title;
-        if (playerSongMeta) playerSongMeta.textContent = `${song.artist} • ${song.file}`;
-        if (likedBadge) likedBadge.textContent = likedSongs.includes(song.id) ? "❤ Liked" : "♡ Not liked";
-      }
-
-      function renderPlaylist() {
-        if (!playlistBox) return;
-        playlistBox.innerHTML = "";
-
-        songsLibrary.forEach((song, index) => {
-          const row = document.createElement("div");
-          row.style.padding = "10px";
-          row.style.borderBottom = "1px dashed rgba(255,255,255,.04)";
-          row.style.display = "flex";
-          row.style.justifyContent = "space-between";
-          row.style.gap = "8px";
-          row.style.alignItems = "center";
-
-          const active = index === currentSongIndex;
-          row.innerHTML = `
-            <div>
-              <div style="font-weight:700; color:${active ? '#9ae6b4' : '#eaf3ff'}">${escapeHtml(song.title)}</div>
-              <div class="hint">${escapeHtml(song.artist)}</div>
-            </div>
-            <div style="display:flex; gap:8px; flex-wrap:wrap;">
-              <button class="smallbtn song-play-btn" data-index="${index}">Play</button>
-              <button class="smallbtn song-like-btn" data-index="${index}">${likedSongs.includes(song.id) ? "Unlike" : "Like"}</button>
-            </div>
-          `;
-          playlistBox.appendChild(row);
-        });
-
-        playlistBox.querySelectorAll(".song-play-btn").forEach(btn => {
-          btn.addEventListener("click", () => {
-            const idx = Number(btn.getAttribute("data-index"));
-            playSongByIndex(idx);
-          });
-        });
-
-        playlistBox.querySelectorAll(".song-like-btn").forEach(btn => {
-          btn.addEventListener("click", () => {
-            const idx = Number(btn.getAttribute("data-index"));
-            toggleLikeSong(idx);
-          });
-        });
-      }
-
-      function renderLikedSongs() {
-        if (!likedSongsBox) return;
-        likedSongsBox.innerHTML = "";
-
-        const liked = songsLibrary.filter(song => likedSongs.includes(song.id));
-
-        if (!liked.length) {
-          likedSongsBox.textContent = "No liked songs yet";
-          return;
-        }
-
-        liked.forEach(song => {
-          const row = document.createElement("div");
-          row.style.padding = "8px";
-          row.style.borderBottom = "1px dashed rgba(255,255,255,.04)";
-          row.innerHTML = `<strong>${escapeHtml(song.title)}</strong><div class="hint">${escapeHtml(song.artist)}</div>`;
-          likedSongsBox.appendChild(row);
-        });
-      }
-
-      function playSongByIndex(index) {
-        if (index < 0 || index >= songsLibrary.length || !jarvisAudio) return;
-
-        currentSongIndex = index;
-        const song = songsLibrary[index];
-        jarvisAudio.src = song.file;
-        jarvisAudio.play()
-          .then(() => {
-            log("Playing local song: " + song.title);
-            speak("Playing " + song.title);
-            updateNowPlayingUI();
-            renderPlaylist();
-          })
-          .catch(err => {
-            log("Audio play failed: " + err.message, "err");
-            alert("Song play failed. Check file path or upload.");
-          });
-      }
-
-      function playSongFromInput() {
-        const q = musicInput?.value.trim();
-        if (!q) {
-          alert("Enter song name first");
-          return;
-        }
-
-        const idx = getSongByQuery(q);
-        if (idx >= 0) {
-          playSongByIndex(idx);
-        } else {
-          speak("Song not found in local playlist");
-        }
-      }
-
-      function playNextSong() {
-        if (!songsLibrary.length) return;
-        if (currentSongIndex < 0) {
-          playSongByIndex(0);
-          return;
-        }
-        const nextIndex = (currentSongIndex + 1) % songsLibrary.length;
-        playSongByIndex(nextIndex);
-      }
-
-      function playPreviousSong() {
-        if (!songsLibrary.length) return;
-        if (currentSongIndex < 0) {
-          playSongByIndex(0);
-          return;
-        }
-        const prevIndex = (currentSongIndex - 1 + songsLibrary.length) % songsLibrary.length;
-        playSongByIndex(prevIndex);
-      }
-
-      function toggleLikeSong(index = currentSongIndex) {
-        if (index < 0 || !songsLibrary[index]) return;
-        const songId = songsLibrary[index].id;
-
-        if (likedSongs.includes(songId)) {
-          likedSongs = likedSongs.filter(id => id !== songId);
-          speak("Removed from liked songs");
-        } else {
-          likedSongs.push(songId);
-          speak("Added to liked songs");
-        }
-
-        saveJson("jarvis_liked_songs", likedSongs);
-        updateNowPlayingUI();
-        renderPlaylist();
-        renderLikedSongs();
-      }
-
-      function togglePlayPause() {
-        if (!jarvisAudio) return;
-        if (!jarvisAudio.src && songsLibrary.length) {
-          playSongByIndex(0);
-          return;
-        }
-
-        if (jarvisAudio.paused) {
-          jarvisAudio.play();
-          speak("Resuming song");
-        } else {
-          jarvisAudio.pause();
-          speak("Pausing song");
-        }
-      }
-
-      function stopInAppAudio() {
-        if (!jarvisAudio) return;
-        jarvisAudio.pause();
-        jarvisAudio.currentTime = 0;
-        log("In-app audio stopped");
-        speak("Song stopped");
-      }
-
-      async function playSongOnYouTube(query) {
-        const idx = getSongByQuery(query);
-        if (idx >= 0) {
-          playSongByIndex(idx);
-          return true;
-        }
-
-        speak("Opening YouTube for " + query);
-        openUrl("https://www.youtube.com/results?search_query=" + encodeURIComponent(query));
-        return false;
-      }
-
-      function playSongOnSpotify(query) {
-        openUrl("https://open.spotify.com/search/" + encodeURIComponent(query));
-        speak("Opening Spotify for " + query);
-      }
-
-      function getMemories() {
-        return loadJson("jarvis_mems", []);
-      }
-
-      function setMemories(items) {
-        saveJson("jarvis_mems", items);
-      }
-
-      function renderMemories() {
-        if (!memList) return;
-        const mems = getMemories();
-        memList.innerHTML = "";
-        if (mems.length === 0) {
-          memList.textContent = "No memories saved";
-          return;
-        }
-
-        mems.slice().reverse().forEach((m, i) => {
-          const card = document.createElement("div");
-          card.style.padding = "6px";
-          card.style.borderBottom = "1px dashed rgba(255,255,255,.04)";
-          card.innerHTML = `
-            <strong style="color:#9ae6b4">${new Date(m.time).toLocaleString()}</strong>
-            <div style="margin-top:4px">${escapeHtml(m.text)}</div>
-            <div style="margin-top:6px">
-              <button class="smallbtn mem-del" data-i="${mems.length - 1 - i}">Delete</button>
-            </div>
-          `;
-          memList.appendChild(card);
-        });
-
-        memList.querySelectorAll(".mem-del").forEach(btn => {
-          btn.addEventListener("click", () => {
-            const idx = Number(btn.getAttribute("data-i"));
-            const memsNow = getMemories();
-            memsNow.splice(idx, 1);
-            setMemories(memsNow);
-            renderMemories();
-            speak("Memory deleted");
-          });
-        });
-      }
-
-      function showMemories() {
-        renderMemories();
-        memList?.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-
-      function pushCommandHistory(cmd) {
-        commandHistory.unshift(cmd);
-        commandHistory = commandHistory.slice(0, 12);
-        saveJson("jarvis_command_history", commandHistory);
-        renderRecentCommands();
-      }
-
-      function renderRecentCommands() {
-        if (!recentCommands) return;
-        recentCommands.innerHTML = "";
-        if (!commandHistory.length) {
-          recentCommands.textContent = "No recent commands";
-          return;
-        }
-
-        commandHistory.forEach(cmd => {
-          const chip = document.createElement("span");
-          chip.className = "chip";
-          chip.textContent = cmd;
-          chip.addEventListener("click", () => {
-            if (cmdInput) cmdInput.value = cmd;
-            runCommandPipeline(cmd);
-          });
-          recentCommands.appendChild(chip);
-        });
-      }
-
-      function renderStats() {
-        if (statsBox) {
-          statsBox.innerHTML = `
-            <div><strong>Commands run:</strong> ${stats.commandsRun}</div>
-            <div style="margin-top:6px"><strong>Searches:</strong> ${stats.searches}</div>
-            <div style="margin-top:6px"><strong>Screenshots:</strong> ${stats.screenshots}</div>
-            <div style="margin-top:6px"><strong>Memories saved:</strong> ${stats.memoriesSaved}</div>
-            <div style="margin-top:6px"><strong>Jokes told:</strong> ${stats.jokesTold}</div>
-          `;
-        }
-        if (statCommandsMini) statCommandsMini.textContent = stats.commandsRun;
-        if (statMemoriesMini) statMemoriesMini.textContent = stats.memoriesSaved;
-      }
-
-      function saveStats() {
-        saveJson("jarvis_stats", stats);
-        renderStats();
-      }
-
-      function runBootSequence() {
-        if (!bootBar || !bootText || !bootPanel || !bootPercent) return;
-
-        const steps = [
-          "Booting core modules...",
-          "Loading Stark HUD overlays...",
-          "Starting neural voice engine...",
-          "Calibrating microphone array...",
-          "Syncing memory core...",
-          "Mounting assistant interface...",
-          "System ready."
-        ];
-
-        let i = 0;
-        bootBar.style.width = "0%";
-        bootPercent.textContent = "0%";
-        bootText.textContent = steps[0];
-
-        const id = setInterval(() => {
-          i++;
-          const pct = Math.min(100, Math.round((i / steps.length) * 100));
-          bootBar.style.width = pct + "%";
-          bootPercent.textContent = pct + "%";
-          bootText.textContent = steps[Math.min(i, steps.length - 1)];
-
-          if (i >= steps.length) {
-            clearInterval(id);
-            setTimeout(() => {
-              bootPanel.style.display = "none";
-            }, 900);
-          }
-        }, 520);
-      }
-
-      function applySavedTheme() {
-        const mode = localStorage.getItem("jarvis_theme") || "dark";
-        document.body.classList.toggle("light-mode", mode === "light");
-      }
-
-      function toggleTheme() {
-        const isLight = document.body.classList.toggle("light-mode");
-        localStorage.setItem("jarvis_theme", isLight ? "light" : "dark");
-        log("Theme set to " + (isLight ? "light" : "dark"));
-      }
-
-      async function startVoiceMeter() {
-        try {
-          if (!navigator.mediaDevices?.getUserMedia || !voiceMeterFill) return;
-          if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-          meterSource = audioContext.createMediaStreamSource(stream);
-          analyser = audioContext.createAnalyser();
-          analyser.fftSize = 256;
-          meterSource.connect(analyser);
-          const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-          const loop = () => {
-            analyser.getByteFrequencyData(dataArray);
-            let sum = 0;
-            for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
-            const avg = sum / dataArray.length;
-            const pct = Math.min(100, Math.round((avg / 255) * 100));
-            voiceMeterFill.style.width = pct + "%";
-            meterRaf = requestAnimationFrame(loop);
-          };
-
-          meterRaf = requestAnimationFrame(loop);
-        } catch {}
-      }
-
-      function stopVoiceMeter() {
-        if (meterRaf) {
-          cancelAnimationFrame(meterRaf);
-          meterRaf = null;
-        }
-        if (meterSource?.mediaStream) {
-          meterSource.mediaStream.getTracks().forEach(t => t.stop());
-          try { meterSource.disconnect(); } catch {}
-        }
-        if (analyser) {
-          try { analyser.disconnect(); } catch {}
-          analyser = null;
-        }
-        if (voiceMeterFill) voiceMeterFill.style.width = "0%";
-      }
-
-      function setupRecognition() {
-        if (!SpeechRecognition) {
-          if (listenStatus) listenStatus.textContent = "SpeechRecognition not supported";
-          if (btnStart) btnStart.disabled = true;
-          if (btnStop) btnStop.disabled = true;
-          log("Speech recognition API not supported", "err");
-          return;
-        }
-
-        recognition = new SpeechRecognition();
-        recognition.lang = lang;
-        recognition.interimResults = false;
-        recognition.continuous = chkContinuous?.checked || false;
-        recognition.maxAlternatives = 1;
-
-        recognition.onstart = () => {
-          listening = true;
-          setListeningUI(true);
-          log("Voice recognition started");
-          startVoiceMeter();
-        };
-
-        recognition.onend = () => {
-          listening = false;
-          setListeningUI(false);
-          stopVoiceMeter();
-          log("Voice recognition stopped");
-
-          if (chkContinuous?.checked && recognition && !manuallyStopped) {
-            setTimeout(() => {
-              try { recognition.start(); } catch {}
-            }, 250);
-          }
-        };
-
-        recognition.onerror = ev => {
-          log("Speech error: " + ev.error, "err");
-          stopVoiceMeter();
-        };
-
-        recognition.onresult = ev => {
-          const res = ev.results[ev.results.length - 1][0].transcript.trim();
-          addTranscriptEntry("User: " + res);
-          log("Heard: " + res);
-
-          const lower = res.toLowerCase();
-          const wakePattern = new RegExp(`^.*?(${customWake.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}|hey jarvis|ok jarvis)[, ]*`, "i");
-
-          if (chkWakeReq?.checked) {
-            if (wakePattern.test(lower)) {
-              const stripped = res.replace(wakePattern, "").trim();
-              if (stripped) runCommandPipeline(stripped);
-              else speak("Yes?");
-            } else {
-              log("Ignored — wake phrase required");
-            }
-            return;
-          }
-
-          if (wakeWordOn && wakePattern.test(lower)) {
-            const stripped = res.replace(wakePattern, "").trim();
-            if (stripped) runCommandPipeline(stripped);
-            else speak("Yes?");
-            return;
-          }
-
-          runCommandPipeline(res);
-        };
-      }
-
-      function handleExtraCommand(raw) {
-        const lower = raw.toLowerCase().trim();
-
-        if (/^(power\s*off( phone)?|shutdown( phone)?)$/.test(lower)) { powerOffAnimation(); return true; }
-        if (/^(restart( phone)?|reboot( phone)?)$/.test(lower)) { restartAnimation(); return true; }
-        if (/^(flashlight|torch) on$/.test(lower)) { flashlight(true); return true; }
-        if (/^(flashlight|torch) off$/.test(lower)) { flashlight(false); return true; }
-        if (/^open camera$/.test(lower)) { openCamera(); return true; }
-        if (/^close camera$/.test(lower)) { closeCamera(); return true; }
-        if (/^open whatsapp$/.test(lower)) { openWhatsApp(); return true; }
-        if (/^open gallery$/.test(lower)) { openGallery(); return true; }
-        if (/^battery status$/.test(lower)) { batteryStatus(); return true; }
-        if (/^device info$/.test(lower)) { deviceInfo(); return true; }
-        if (/^keep screen on$/.test(lower)) { keepScreenOn(); return true; }
-        if (/^allow sleep$/.test(lower)) { allowSleep(); return true; }
-        if (/^vibrate$/.test(lower)) { vibrate(); return true; }
-        if (/^lock screen$/.test(lower)) { lockScreen(); return true; }
-        if (/^unlock screen$/.test(lower)) { unlockScreen(); return true; }
-        if (/^news$/.test(lower)) { openNews(); return true; }
-        if (/^weather$/.test(lower)) { openUrl("https://wttr.in/?format=3"); return true; }
-        if (/^play spotify$/.test(lower)) { openUrl("https://open.spotify.com/collection/playlists"); return true; }
-        if (/^screenshot$/.test(lower)) { takeScreenshot(); return true; }
-        if (/^motivate$/.test(lower)) { speak(quotes[Math.floor(Math.random() * quotes.length)]); return true; }
-        if (/^self destruct$/.test(lower)) { runSelfDestruct(); return true; }
-
-        return false;
-      }
-
-      function runCommandPipeline(text) {
-        let cleaned = normalizeCommand(text);
-        if (!cleaned) return;
-
-        cleaned = normalizeHindiAliases(cleaned);
-
-        stats.commandsRun++;
-        saveStats();
-        pushCommandHistory(cleaned);
-
-        if (handleExtraCommand(cleaned)) return;
-        handleCommand(cleaned);
-      }
-
-      async function handleCommand(textRaw) {
-        const text = textRaw.trim();
-        if (!text) return;
-        const lower = text.toLowerCase();
-
-        if (/^(hi|hello|hey|hey jarvis|ok jarvis)\b/.test(lower)) {
-          speak("Hello. How can I help?");
-          addTranscriptEntry("Jarvis: Hello. How can I help?");
-          return;
-        }
-
-        if (lower === "next song") {
-          playNextSong();
-          return;
-        }
-
-        if (lower === "previous song") {
-          playPreviousSong();
-          return;
-        }
-
-        if (lower === "pause song") {
-          jarvisAudio?.pause();
-          speak("Song paused");
-          return;
-        }
-
-        if (lower === "resume song") {
-          jarvisAudio?.play();
-          speak("Resuming song");
-          return;
-        }
-
-        if (lower === "like song") {
-          toggleLikeSong();
-          return;
-        }
-
-        if (/^play\s+/i.test(text)) {
-          const query = text.replace(/^play\s+/i, "").trim();
-
-          if (!query) {
-            speak("Please tell me the song name");
-            return;
-          }
-
-          if (/on spotify|in spotify/i.test(text)) {
-            playSongOnSpotify(query.replace(/\s+on spotify|\s+in spotify/i, "").trim());
-            return;
-          }
-
-          await playSongOnYouTube(query.replace(/\s+on youtube|\s+in youtube/i, "").trim());
-          return;
-        }
-
-        if (lower.includes("time")) {
-          const out = `It is ${new Date().toLocaleTimeString()}`;
-          speak(out);
-          addTranscriptEntry("Jarvis: " + out);
-          return;
-        }
-
-        if (lower.includes("date")) {
-          const out = `Today is ${new Date().toLocaleDateString()}`;
-          speak(out);
-          addTranscriptEntry("Jarvis: " + out);
-          return;
-        }
-
-        if (/\bopen (youtube|google|wikipedia|github|spotify|maps)\b/.test(lower)) {
-          let site = "https://google.com";
-          if (lower.includes("youtube")) site = "https://youtube.com";
-          else if (lower.includes("wikipedia")) site = "https://wikipedia.org";
-          else if (lower.includes("github")) site = "https://github.com";
-          else if (lower.includes("spotify")) site = "https://open.spotify.com";
-          else if (lower.includes("maps")) site = "https://maps.google.com";
-
-          speak("Opening " + site.replace(/^https?:\/\//, ""));
-          openUrl(site);
-          addTranscriptEntry("Jarvis: opening " + site);
-          return;
-        }
-
-        if (lower.startsWith("search ") || lower.startsWith("google ")) {
-          const q = text.replace(/^(search|google)\s+/i, "").trim();
-          if (!q) {
-            speak("What do you want me to search?");
-            return;
-          }
-          stats.searches++;
-          saveStats();
-          speak("Searching Google for " + q);
-          openUrl("https://www.google.com/search?q=" + encodeURIComponent(q));
-          addTranscriptEntry("Jarvis: searched for " + q);
-          return;
-        }
-
-        if (lower.startsWith("wiki ") || lower.startsWith("wikipedia ")) {
-          const term = text.replace(/^(wiki|wikipedia)\s+/i, "").trim();
-          if (!term) {
-            speak("What do you want from Wikipedia?");
-            return;
-          }
-
-          speak("Searching Wikipedia for " + term);
-          addTranscriptEntry("Jarvis: fetching Wikipedia for " + term);
-
-          try {
-            const api = "https://en.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(term);
-            const r = await fetch(api);
-            if (!r.ok) {
-              speak("No Wikipedia page found for " + term);
-              return;
-            }
-            const j = await r.json();
-            const extract = j.extract
-              ? j.extract.split(". ").slice(0, 2).join(". ") + "."
-              : "No summary available.";
-
-            speak(extract);
-            addTranscriptEntry("Wiki: " + extract);
-          } catch (e) {
-            speak("Failed to fetch Wikipedia.");
-            addTranscriptEntry("Wiki error: " + e.message, "err");
-          }
-          return;
-        }
-
-        if (
-          lower.startsWith("calculate ") ||
-          lower.startsWith("what is ") ||
-          /^[0-9+\-*/(). %]+$/.test(lower)
-        ) {
-          const expr = text
-            .replace(/^(calculate|what is)\s+/i, "")
-            .replace(/[^0-9+\-*/(). %]/g, "");
-
-          if (!expr) {
-            speak("I could not parse the expression");
-            return;
-          }
-
-          try {
-            const val = Function(`"use strict"; return (${expr})`)();
-            speak("The result is " + val);
-            addTranscriptEntry("Calc: " + expr + " = " + val);
-          } catch (e) {
-            speak("Sorry, cannot calculate that.");
-            addTranscriptEntry("Calc error: " + e.message, "err");
-          }
-          return;
-        }
-
-        if (lower.startsWith("set timer") || lower.startsWith("timer ")) {
-          const m = lower.match(/(\d+)\s*(seconds|second|minutes|minute|secs|mins)?/);
-          if (!m) {
-            speak("Please tell me the time in seconds or minutes");
-            return;
-          }
-
-          const num = parseInt(m[1], 10);
-          const unit = (m[2] || "seconds").toLowerCase();
-          const ms = unit.startsWith("min") ? num * 60 * 1000 : num * 1000;
-
-          speak(`Timer set for ${num} ${unit.startsWith("min") ? "minutes" : "seconds"}`);
-          addTranscriptEntry(`Timer: ${num} ${unit}`);
-
-          setTimeout(() => {
-            speak(`Timer finished: ${num} ${unit.startsWith("min") ? "minutes" : "seconds"}`);
-            alert(`Timer finished: ${num} ${unit}`);
-          }, ms);
-          return;
-        }
-
-        if (lower.includes("joke")) {
-          const joke = jokes[Math.floor(Math.random() * jokes.length)];
-          stats.jokesTold++;
-          saveStats();
-          speak(joke);
-          addTranscriptEntry("Joke: " + joke);
-          return;
-        }
-
-        if (lower.includes("motivate") || lower.includes("motivation") || lower.includes("quote")) {
-          const q = quotes[Math.floor(Math.random() * quotes.length)];
-          speak(q);
-          addTranscriptEntry("Quote: " + q);
-          return;
-        }
-
-        if (lower.includes("weather")) {
-          const m = text.match(/weather in (.+)$/i);
-          const place = m ? m[1].trim() : "";
-          if (place) {
-            speak("Opening weather for " + place);
-            openUrl("https://wttr.in/" + encodeURIComponent(place));
-          } else {
-            speak("Opening weather report");
-            openUrl("https://wttr.in/?format=3");
-          }
-          return;
-        }
-
-        if (lower.startsWith("translate ")) {
-          const m = text.match(/^translate\s+(.+?)\s+to\s+([a-zA-Z\-]+)/i);
-          if (m) {
-            const phrase = m[1];
-            const target = m[2];
-            speak("Translating to " + target);
-            openUrl(
-              "https://translate.google.com/?sl=auto&tl=" +
-              encodeURIComponent(target) +
-              "&text=" +
-              encodeURIComponent(phrase) +
-              "&op=translate"
-            );
-          } else {
-            speak("Opening Google Translate");
-            openUrl("https://translate.google.com");
-          }
-          return;
-        }
-
-        if (lower.startsWith("remember ")) {
-          const mem = text.replace(/^remember\s+/i, "").trim();
-          if (mem) {
-            const mems = getMemories();
-            mems.push({ text: mem, time: Date.now() });
-            setMemories(mems);
-            stats.memoriesSaved++;
-            saveStats();
-            speak("Done. I will remember: " + mem);
-            addTranscriptEntry("Memory saved: " + mem);
-            renderMemories();
-          } else {
-            speak("What should I remember?");
-          }
-          return;
-        }
-
-        if (
-          lower.includes("what do you remember") ||
-          lower.includes("list memories") ||
-          lower.includes("what did i ask you to remember")
-        ) {
-          const mems = getMemories();
-          if (mems.length === 0) {
-            speak("You have no saved memories.");
-            return;
-          }
-          speak(`You asked me to remember ${mems.length} items. I will show them now.`);
-          renderMemories();
-          showMemories();
-          return;
-        }
-
-        if (lower.includes("screenshot") || lower.includes("screen shot") || lower.includes("capture screen")) {
-          takeScreenshot();
-          return;
-        }
-
-        if (lower.includes("power off") || lower.includes("shutdown")) { powerOffAnimation(); return; }
-        if (lower.includes("restart")) { restartAnimation(); return; }
-        if (lower.includes("flashlight on") || lower.includes("torch on")) { flashlight(true); return; }
-        if (lower.includes("flashlight off") || lower.includes("torch off")) { flashlight(false); return; }
-        if (lower.includes("open camera") || lower.includes("show camera")) { openCamera(); return; }
-        if (lower.includes("close camera") || lower.includes("hide camera")) { closeCamera(); return; }
-        if (lower.includes("whatsapp")) { openWhatsApp(); speak("Opening WhatsApp"); return; }
-        if (lower.includes("gallery")) { openGallery(); return; }
-        if (lower.includes("keep screen on") || lower.includes("stay awake")) { keepScreenOn(); return; }
-        if (lower.includes("allow sleep")) { allowSleep(); return; }
-        if (lower.includes("vibrate")) { vibrate(); return; }
-        if (lower.includes("lock screen")) { lockScreen(); return; }
-        if (lower.includes("unlock screen")) { unlockScreen(); return; }
-        if (lower.includes("news") || lower.includes("top news")) { openNews(); return; }
-
-        if (lower.includes("physics wallah") || lower.includes("open pw") || lower.includes("play pw")) {
-          speak("Opening Physics Wallah");
-          try {
-            window.location.href = "intent://#Intent;package=in.eduwall.pwclassroom;scheme=pw;end";
-          } catch {}
-          setTimeout(() => openUrl("https://www.pw.live/"), 800);
-          return;
-        }
-
-        speak("I did not understand. Do you want me to search the web?");
-        if (confirm(`Search web for "${text}"?`)) {
-          stats.searches++;
-          saveStats();
-          openUrl("https://www.google.com/search?q=" + encodeURIComponent(text));
-        }
-      }
-
-      async function openCamera() {
-        try {
-          cameraOverlay.style.display = "flex";
-          if (camStream) {
-            camStream.getTracks().forEach(t => t.stop());
-            camStream = null;
-          }
-          camStream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: usingBackCam ? { ideal: "environment" } : "user" },
-            audio: false
-          });
-          camVideo.srcObject = camStream;
-          log("Camera opened");
-        } catch (e) {
-          log("Camera error: " + e.message, "err");
-          alert("Camera permission or device error.");
-        }
-      }
-
-      function closeCamera() {
-        cameraOverlay.style.display = "none";
-        if (camStream) {
-          camStream.getTracks().forEach(t => t.stop());
-          camStream = null;
-        }
-        log("Camera closed");
-      }
-
-      function flashlight(on) {
-        flashlightOverlay.style.display = on ? "flex" : "none";
-        flashlightOverlay.style.background = on ? "#ffffff" : "transparent";
-        log("Flashlight " + (on ? "on" : "off"));
-      }
-
-      async function batteryStatus() {
-        try {
-          if (!("getBattery" in navigator)) {
-            alert("Battery API not supported");
-            return;
-          }
-          const b = await navigator.getBattery();
-          const pct = Math.round(b.level * 100);
-          const charging = b.charging ? "charging" : "not charging";
-          alert(`Battery: ${pct}% (${charging})`);
-          log(`Battery status: ${pct}% (${charging})`);
-        } catch (e) {
-          log("Battery error: " + e.message, "err");
-        }
-      }
-
-      function deviceInfo() {
-        const info = `UA: ${navigator.userAgent}\nPlatform: ${navigator.platform}\nLanguage: ${navigator.language}`;
-        alert(info);
-        log("Device info shown");
-      }
-
-      async function keepScreenOn() {
-        try {
-          if ("wakeLock" in navigator) {
-            wakeLock = await navigator.wakeLock.request("screen");
-            log("Wake Lock active (screen on)");
-          } else {
-            alert("Wake Lock API not supported in this browser");
-          }
-        } catch (e) {
-          log("Wake Lock error: " + e.message, "err");
-        }
-      }
-
-      function allowSleep() {
-        if (wakeLock) {
-          try { wakeLock.release(); } catch {}
-          wakeLock = null;
-          log("Wake Lock released");
-        }
-      }
-
-      function vibrate() {
-        if ("vibrate" in navigator) {
-          navigator.vibrate([60, 40, 60, 40, 120]);
-          log("Vibration pattern played");
-        } else {
-          alert("Vibration not supported on this device");
-        }
-      }
-
-      function lockScreen() {
-        lockOverlay.style.display = "flex";
-        log("Screen locked (UI)");
-      }
-
-      function unlockScreen() {
-        lockOverlay.style.display = "none";
-        log("Screen unlocked (UI)");
-      }
-
-      function openWhatsApp() {
-        try {
-          window.location.href = "intent://send/#Intent;scheme=whatsapp;package=com.whatsapp;end";
-          setTimeout(() => openUrl("https://web.whatsapp.com"), 800);
-        } catch {
-          openUrl("https://web.whatsapp.com");
-        }
-        log("WhatsApp request");
-      }
-
-      function openGallery() {
-        openUrl("https://photos.google.com");
-        log("Gallery opened");
-      }
-
-      function powerOffAnimation() {
-        powerOverlay.style.display = "flex";
-        restartText.textContent = "Powering off...";
-        setTimeout(() => { document.body.style.filter = "brightness(0)"; }, 600);
-        log("Simulated power off");
-      }
-
-      function restartAnimation() {
-        powerOverlay.style.display = "flex";
-        restartText.textContent = "Restarting...";
-        setTimeout(() => { document.body.style.filter = "brightness(0)"; }, 600);
-        setTimeout(() => {
-          document.body.style.filter = "";
-          powerOverlay.style.display = "none";
-          log("Simulated restart finished");
-        }, 3200);
-        log("Simulated restart");
-      }
-
-      async function takeScreenshot() {
-        alert("Screenshot feature needs html2canvas if you want full-page capture.");
-        log("Screenshot requested");
-      }
-
-      function runSelfDestruct() {
-        const c = boomCanvas;
-        if (!c) return;
-        c.width = window.innerWidth;
-        c.height = window.innerHeight;
-        c.style.display = "block";
-        const ctx = c.getContext("2d");
-        const sparks = [];
-
-        for (let i = 0; i < 220; i++) {
-          sparks.push({
-            x: window.innerWidth / 2 + (Math.random() - 0.5) * 200,
-            y: window.innerHeight / 2 + (Math.random() - 0.5) * 200,
-            vx: (Math.random() - 0.5) * 14,
-            vy: (Math.random() - 0.9) * 14 - 4,
-            r: Math.random() * 6 + 2,
-            life: Math.random() * 100 + 40,
-            color: `rgba(${200 + Math.floor(Math.random() * 55)},${Math.floor(Math.random() * 140)},0,`
-          });
-        }
-
-        let t = 0;
-        speak("Self destruct in 3... 2... 1...");
-        const originalTransform = document.body.style.transform || "";
-
-        const id = setInterval(() => {
-          ctx.fillStyle = "rgba(0,0,0,.12)";
-          ctx.fillRect(0, 0, c.width, c.height);
-
-          sparks.forEach(p => {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.vy += 0.18;
-            p.life--;
-            ctx.beginPath();
-            ctx.fillStyle = p.color + (p.life / 140) + ")";
-            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-            ctx.fill();
-          });
-
-          t++;
-          if (t % 6 === 0) {
-            document.body.style.transform = `translate(${(Math.random() - 0.5) * 8}px, ${(Math.random() - 0.5) * 8}px)`;
-          }
-
-          if (t > 160) {
-            clearInterval(id);
-            ctx.clearRect(0, 0, c.width, c.height);
-            c.style.display = "none";
-            document.body.style.transform = originalTransform;
-            log("Self-destruct animation done");
-          }
-        }, 16);
-      }
-
-      function playRPS() {
-        const choices = ["rock", "paper", "scissors"];
-        const user = prompt("Choose rock, paper or scissors:");
-        if (!user) return;
-        const u = user.toLowerCase();
-        if (!choices.includes(u)) { alert("Invalid choice"); return; }
-        const bot = choices[Math.floor(Math.random() * 3)];
-        let res = "Draw";
-        if ((u === "rock" && bot === "scissors") || (u === "paper" && bot === "rock") || (u === "scissors" && bot === "paper")) res = "You win!";
-        else if (u !== bot) res = "You lose!";
-        speak(`You chose ${u}. I chose ${bot}. ${res}`);
-        alert(`You: ${u}\nJarvis: ${bot}\n\n${res}`);
-      }
-
-      function playGuess() {
-        const target = Math.floor(Math.random() * 50) + 1;
-        let tries = 0;
-        let ok = false;
-
-        while (tries < 7) {
-          const g = prompt("Guess the number (1-50). Attempts left: " + (7 - tries));
-          if (g === null) return;
-          const n = parseInt(g, 10);
-          if (Number.isNaN(n)) { alert("Enter a number"); continue; }
-          tries++;
-          if (n === target) {
-            speak("Correct!");
-            alert("Correct! The number was " + target);
-            ok = true;
-            break;
-          } else if (n < target) {
-            speak("Higher");
-            alert("Higher");
-          } else {
-            speak("Lower");
-            alert("Lower");
-          }
-        }
-
-        if (!ok) {
-          speak("Out of attempts. The number was " + target);
-          alert("Out of attempts. The number was " + target);
-        }
-      }
-
-      async function computeImageDiff(aDataUrl, bDataUrl) {
-        function loadImage(src) {
-          return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.crossOrigin = "anonymous";
-            img.onload = () => resolve(img);
-            img.onerror = reject;
-            img.src = src;
-          });
-        }
-
-        const [a, b] = await Promise.all([loadImage(aDataUrl), loadImage(bDataUrl)]);
-        const w = Math.min(a.width, b.width, 160);
-        const h = Math.min(a.height, b.height, 120);
-
-        const ca = document.createElement("canvas");
-        ca.width = w; ca.height = h;
-        const ctxA = ca.getContext("2d");
-        ctxA.drawImage(a, 0, 0, w, h);
-
-        const cb = document.createElement("canvas");
-        cb.width = w; cb.height = h;
-        const ctxB = cb.getContext("2d");
-        ctxB.drawImage(b, 0, 0, w, h);
-
-        const da = ctxA.getImageData(0, 0, w, h).data;
-        const db = ctxB.getImageData(0, 0, w, h).data;
-
-        let sum = 0, len = 0;
-        for (let i = 0; i < da.length; i += 4) {
-          const la = 0.299 * da[i] + 0.587 * da[i + 1] + 0.114 * da[i + 2];
-          const lb = 0.299 * db[i] + 0.587 * db[i + 1] + 0.114 * db[i + 2];
-          sum += Math.abs(la - lb);
-          len++;
-        }
-
-        return sum / (len * 255);
-      }
-
-      function renderFacePreview(data) {
-        facePreview.innerHTML = "";
-        const img = document.createElement("img");
-        img.src = data;
-        facePreview.appendChild(img);
-      }
-
-      function stopListening() {
-        manuallyStopped = true;
-        if (recognition) {
-          try { recognition.stop(); } catch {}
-        }
-        listening = false;
-        setListeningUI(false);
-        stopVoiceMeter();
-        log("Stopped listening");
-      }
-
-      window.addEventListener("beforeinstallprompt", e => {
-        e.preventDefault();
-        deferredPrompt = e;
-        if (installBanner) installBanner.style.display = "block";
+    }
+
+    const [a, b] = await Promise.all([loadImage(aDataUrl), loadImage(bDataUrl)]);
+    const w = Math.min(a.width, b.width, 160);
+    const h = Math.min(a.height, b.height, 120);
+
+    const ca = document.createElement("canvas");
+    ca.width = w; ca.height = h;
+    const ctxA = ca.getContext("2d");
+    ctxA.drawImage(a, 0, 0, w, h);
+
+    const cb = document.createElement("canvas");
+    cb.width = w; cb.height = h;
+    const ctxB = cb.getContext("2d");
+    ctxB.drawImage(b, 0, 0, w, h);
+
+    const da = ctxA.getImageData(0, 0, w, h).data;
+    const db = ctxB.getImageData(0, 0, w, h).data;
+
+    let sum = 0, len = 0;
+    for (let i = 0; i < da.length; i += 4) {
+      const la = 0.299 * da[i] + 0.587 * da[i + 1] + 0.114 * da[i + 2];
+      const lb = 0.299 * db[i] + 0.587 * db[i + 1] + 0.114 * db[i + 2];
+      sum += Math.abs(la - lb);
+      len++;
+    }
+
+    return sum / (len * 255);
+  }
+
+  function renderFacePreview(data) {
+    facePreview.innerHTML = "";
+    const img = document.createElement("img");
+    img.src = data;
+    facePreview.appendChild(img);
+  }
+
+  function stopListening() {
+    manuallyStopped = true;
+    if (recognition) {
+      try { recognition.stop(); } catch {}
+    }
+    listening = false;
+    setListeningUI(false);
+    stopVoiceMeter();
+    log("Stopped listening");
+  }
+
+  window.addEventListener("beforeinstallprompt", e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (installBanner) installBanner.style.display = "block";
+  });
+
+  async function doInstall() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    if (installBanner) installBanner.style.display = "none";
+  }
+
+  function init() {
+    if (transcriptEl) transcriptEl.innerHTML = "Press Start Listening and speak — or type below.";
+    lang = langSelect?.value || "en-US";
+    if (wakeInput) wakeInput.value = customWake;
+
+    if (faceDataUrl) {
+      if (faceStatus) faceStatus.textContent = "Face enrolled";
+      renderFacePreview(faceDataUrl);
+    }
+
+    populateVoices();
+    renderMemories();
+    renderRecentCommands();
+    renderStats();
+    renderPlaylist();
+    renderLikedSongs();
+    updateNowPlayingUI();
+    applySavedTheme();
+    runBootSequence();
+    setupRecognition();
+    log("Jarvis ready");
+
+    document.querySelectorAll(".cmd").forEach(el => {
+      el.addEventListener("click", () => {
+        const cmd = el.getAttribute("data-cmd");
+        addTranscriptEntry("User: " + cmd);
+        runCommandPipeline(cmd);
       });
+    });
 
-      async function doInstall() {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        await deferredPrompt.userChoice;
-        deferredPrompt = null;
-        if (installBanner) installBanner.style.display = "none";
-      }
-
-      function init() {
-        if (transcriptEl) transcriptEl.innerHTML = "Press Start Listening and speak — or type below.";
-        lang = langSelect?.value || "en-US";
-        if (wakeInput) wakeInput.value = customWake;
-
-        if (faceDataUrl) {
-          if (faceStatus) faceStatus.textContent = "Face enrolled";
-          renderFacePreview(faceDataUrl);
-        }
-
-        populateVoices();
-        renderMemories();
-        renderRecentCommands();
-        renderStats();
-        renderPlaylist();
-        renderLikedSongs();
-        updateNowPlayingUI();
-        applySavedTheme();
-        runBootSequence();
-        setupRecognition();
-        log("Jarvis ready");
-
-        document.querySelectorAll(".cmd").forEach(el => {
-          el.addEventListener("click", () => {
-            const cmd = el.getAttribute("data-cmd");
-            addTranscriptEntry("User: " + cmd);
-            runCommandPipeline(cmd);
-          });
-        });
-
-        document.querySelectorAll(".util").forEach(el => {
-          el.addEventListener("click", () => {
-            const cmd = el.getAttribute("data-cmd");
-            addTranscriptEntry("User: " + cmd);
-            runCommandPipeline(cmd);
-          });
-        });
-
-        document.querySelectorAll(".app-tile").forEach(tile => {
-          tile.addEventListener("click", () => {
-            const app = tile.getAttribute("data-launch");
-            switch (app) {
-              case "youtube": runCommandPipeline("open youtube"); break;
-              case "spotify": runCommandPipeline("play spotify"); break;
-              case "google": runCommandPipeline("open google"); break;
-              case "maps": runCommandPipeline("open maps"); break;
-              case "github": runCommandPipeline("open github"); break;
-              case "news": runCommandPipeline("news"); break;
-              case "weather": runCommandPipeline("weather"); break;
-              case "camera": runCommandPipeline("open camera"); break;
-              case "gallery": runCommandPipeline("open gallery"); break;
-              case "whatsapp": runCommandPipeline("open whatsapp"); break;
-              case "pw": runCommandPipeline("open pw"); break;
-              case "translate": openUrl("https://translate.google.com"); break;
-            }
-          });
-        });
-
-        jarvisAudio?.addEventListener("ended", () => {
-          playNextSong();
-        });
-
-        document.body.addEventListener("click", unlockSpeech, { once: true });
-      }
-
-      btnInstallApp?.addEventListener("click", doInstall);
-      btnInstallAppBanner?.addEventListener("click", doInstall);
-      btnDismissInstall?.addEventListener("click", () => {
-        if (installBanner) installBanner.style.display = "none";
+    document.querySelectorAll(".util").forEach(el => {
+      el.addEventListener("click", () => {
+        const cmd = el.getAttribute("data-cmd");
+        addTranscriptEntry("User: " + cmd);
+        runCommandPipeline(cmd);
       });
+    });
 
-      btnStart?.addEventListener("click", () => {
-        manuallyStopped = false;
-        unlockSpeech();
-        if (!recognition) setupRecognition();
-        if (recognition && !listening) {
-          try { recognition.start(); } catch {}
+    document.querySelectorAll(".app-tile").forEach(tile => {
+      tile.addEventListener("click", () => {
+        const app = tile.getAttribute("data-launch");
+        switch (app) {
+          case "youtube": runCommandPipeline("open youtube"); break;
+          case "spotify": runCommandPipeline("play spotify"); break;
+          case "google": runCommandPipeline("open google"); break;
+          case "maps": runCommandPipeline("open maps"); break;
+          case "github": runCommandPipeline("open github"); break;
+          case "news": runCommandPipeline("news"); break;
+          case "weather": runCommandPipeline("weather"); break;
+          case "camera": runCommandPipeline("open camera"); break;
+          case "gallery": runCommandPipeline("open gallery"); break;
+          case "whatsapp": runCommandPipeline("open whatsapp"); break;
+          case "pw": runCommandPipeline("open pw"); break;
+          case "translate": openUrl("https://translate.google.com"); break;
         }
       });
+    });
 
-      btnStop?.addEventListener("click", stopListening);
+    jarvisAudio?.addEventListener("ended", () => {
+      playNextSong();
+    });
 
-      btnWake?.addEventListener("click", () => {
-        wakeWordOn = !wakeWordOn;
-        if (wakeState) wakeState.textContent = wakeWordOn ? "On" : "Off";
-        log("Wake-word " + (wakeWordOn ? "enabled" : "disabled"));
-      });
+    document.body.addEventListener("click", unlockSpeech, { once: true });
+  }
 
-      btnToggleVoice?.addEventListener("click", () => {
-        chkVoice.checked = !chkVoice.checked;
-        log("Voice reply " + (chkVoice.checked ? "enabled" : "disabled"));
-      });
+  btnInstallApp?.addEventListener("click", doInstall);
+  btnInstallAppBanner?.addEventListener("click", doInstall);
+  btnDismissInstall?.addEventListener("click", () => {
+    if (installBanner) installBanner.style.display = "none";
+  });
 
-      btnClearLog?.addEventListener("click", () => {
-        if (logEl) logEl.innerHTML = "";
-        if (transcriptEl) transcriptEl.innerHTML = "Press Start Listening and speak — or type below.";
-      });
+  btnStart?.addEventListener("click", () => {
+    manuallyStopped = false;
+    unlockSpeech();
+    if (!recognition) setupRecognition();
+    if (recognition && !listening) {
+      try { recognition.start(); } catch {}
+    }
+  });
 
-      chkContinuous?.addEventListener("change", () => {
-        manuallyStopped = true;
-        if (recognition) {
-          recognition.stop();
-          recognition = null;
-          setupRecognition();
-        }
-      });
+  btnStop?.addEventListener("click", stopListening);
 
-      langSelect?.addEventListener("change", () => {
-        lang = langSelect.value;
-        if (langLabel) langLabel.textContent = langSelect.options[langSelect.selectedIndex].textContent;
-        if (recognition) recognition.lang = lang;
-        populateVoices();
-      });
+  btnWake?.addEventListener("click", () => {
+    wakeWordOn = !wakeWordOn;
+    if (wakeState) wakeState.textContent = wakeWordOn ? "On" : "Off";
+    log("Wake-word " + (wakeWordOn ? "enabled" : "disabled"));
+  });
 
-      voiceSelect?.addEventListener("change", () => {
-        localStorage.setItem("jarvis_voice_index", voiceSelect.value);
-      });
+  btnToggleVoice?.addEventListener("click", () => {
+    chkVoice.checked = !chkVoice.checked;
+    log("Voice reply " + (chkVoice.checked ? "enabled" : "disabled"));
+  });
 
-      btnSend?.addEventListener("click", () => {
-        const text = cmdInput?.value.trim();
-        if (!text) return;
-        addTranscriptEntry("User: " + text);
-        runCommandPipeline(text);
-        cmdInput.value = "";
-      });
+  btnClearLog?.addEventListener("click", () => {
+    if (logEl) logEl.innerHTML = "";
+    if (transcriptEl) transcriptEl.innerHTML = "Press Start Listening and speak — or type below.";
+  });
 
-      cmdInput?.addEventListener("keydown", e => {
-        if (e.key === "Enter") btnSend?.click();
-      });
+  chkContinuous?.addEventListener("change", () => {
+    manuallyStopped = true;
+    if (recognition) {
+      recognition.stop();
+      recognition = null;
+      setupRecognition();
+    }
+  });
 
-      btnStartSong?.addEventListener("click", playSongFromInput);
-      btnPrevSong?.addEventListener("click", playPreviousSong);
-      btnNextSong?.addEventListener("click", playNextSong);
-      btnLikeSong?.addEventListener("click", () => toggleLikeSong());
-      btnPlayPauseSong?.addEventListener("click", togglePlayPause);
+  langSelect?.addEventListener("change", () => {
+    lang = langSelect.value;
+    if (langLabel) langLabel.textContent = langSelect.options[langSelect.selectedIndex].textContent;
+    if (recognition) recognition.lang = lang;
+    populateVoices();
+  });
 
-      btnPlayYT?.addEventListener("click", async () => {
-        const q = musicInput?.value.trim();
-        if (!q) return alert("Enter song name first");
-        await playSongOnYouTube(q);
-      });
+  voiceSelect?.addEventListener("change", () => {
+    localStorage.setItem("jarvis_voice_index", voiceSelect.value);
+  });
 
-      btnPlaySP?.addEventListener("click", () => {
-        const q = musicInput?.value.trim();
-        if (!q) return alert("Enter song name first");
-        playSongOnSpotify(q);
-      });
+  btnSend?.addEventListener("click", () => {
+    const text = cmdInput?.value.trim();
+    if (!text) return;
+    addTranscriptEntry("User: " + text);
+    runCommandPipeline(text);
+    cmdInput.value = "";
+  });
 
-      btnStopAudio?.addEventListener("click", stopInAppAudio);
+  cmdInput?.addEventListener("keydown", e => {
+    if (e.key === "Enter") btnSend?.click();
+  });
 
-      btnWeather?.addEventListener("click", () => runCommandPipeline("weather"));
-      btnNews?.addEventListener("click", () => runCommandPipeline("news"));
-      btnQuote?.addEventListener("click", () => runCommandPipeline("motivate"));
-      btnSpotify?.addEventListener("click", () => runCommandPipeline("play spotify"));
-      btnTranslate?.addEventListener("click", () => {
-        const phrase = prompt("Phrase to translate:");
-        if (phrase) openUrl("https://translate.google.com/?sl=auto&tl=en&text=" + encodeURIComponent(phrase) + "&op=translate");
-      });
-      btnScreenshot?.addEventListener("click", takeScreenshot);
-      btnSelfDestruct?.addEventListener("click", runSelfDestruct);
-      btnRPS?.addEventListener("click", playRPS);
-      btnGuess?.addEventListener("click", playGuess);
+  btnStartSong?.addEventListener("click", playSongFromInput);
+  btnPrevSong?.addEventListener("click", playPreviousSong);
+  btnNextSong?.addEventListener("click", playNextSong);
+  btnLikeSong?.addEventListener("click", () => toggleLikeSong());
+  btnPlayPauseSong?.addEventListener("click", togglePlayPause);
 
-      btnSaveMemory?.addEventListener("click", () => {
-        const txt = prompt("What should I remember?");
-        if (!txt) return;
-        const mems = getMemories();
-        mems.push({ text: txt, time: Date.now() });
-        setMemories(mems);
-        stats.memoriesSaved++;
-        saveStats();
-        speak("Saved that memory.");
-        renderMemories();
-      });
+  btnPlayYT?.addEventListener("click", async () => {
+    const q = musicInput?.value.trim();
+    if (!q) return alert("Enter song name first");
+    await playSongOnYouTube(q);
+  });
 
-      btnShowMemory?.addEventListener("click", showMemories);
+  btnPlaySP?.addEventListener("click", () => {
+    const q = musicInput?.value.trim();
+    if (!q) return alert("Enter song name first");
+    playSongOnSpotify(q);
+  });
 
-      memAdd?.addEventListener("click", () => {
-        const t = memInput?.value.trim();
-        if (!t) return;
-        const mems = getMemories();
-        mems.push({ text: t, time: Date.now() });
-        setMemories(mems);
-        stats.memoriesSaved++;
-        saveStats();
-        memInput.value = "";
-        renderMemories();
-        speak("Memory added.");
-      });
+  btnStopAudio?.addEventListener("click", stopInAppAudio);
 
-      btnSaveWake?.addEventListener("click", () => {
-        const w = wakeInput?.value.trim().toLowerCase();
-        if (!w) return alert("Enter wake phrase");
-        customWake = w;
-        localStorage.setItem("jarvis_wake", w);
-        speak("Custom wake phrase saved as " + w);
-      });
+  btnWeather?.addEventListener("click", () => runCommandPipeline("weather"));
+  btnNews?.addEventListener("click", () => runCommandPipeline("news"));
+  btnQuote?.addEventListener("click", () => runCommandPipeline("motivate"));
+  btnSpotify?.addEventListener("click", () => runCommandPipeline("play spotify"));
+  btnTranslate?.addEventListener("click", () => {
+    const phrase = prompt("Phrase to translate:");
+    if (phrase) openUrl("https://translate.google.com/?sl=auto&tl=en&text=" + encodeURIComponent(phrase) + "&op=translate");
+  });
+  btnScreenshot?.addEventListener("click", takeScreenshot);
+  btnSelfDestruct?.addEventListener("click", runSelfDestruct);
+  btnRPS?.addEventListener("click", playRPS);
+  btnGuess?.addEventListener("click", playGuess);
 
-      btnThemeToggle?.addEventListener("click", toggleTheme);
+  btnSaveMemory?.addEventListener("click", () => {
+    const txt = prompt("What should I remember?");
+    if (!txt) return;
+    const mems = getMemories();
+    mems.push({ text: txt, time: Date.now() });
+    setMemories(mems);
+    stats.memoriesSaved++;
+    saveStats();
+    speak("Saved that memory.");
+    renderMemories();
+  });
 
-      btnVoiceTest?.addEventListener("click", () => {
-        unlockSpeech();
-        speak("Jarvis voice system is now online.");
-      });
+  btnShowMemory?.addEventListener("click", showMemories);
 
-      btnClearMemories?.addEventListener("click", () => {
-        if (!confirm("Delete all saved memories?")) return;
-        setMemories([]);
-        renderMemories();
-        speak("All memories cleared.");
-      });
+  memAdd?.addEventListener("click", () => {
+    const t = memInput?.value.trim();
+    if (!t) return;
+    const mems = getMemories();
+    mems.push({ text: t, time: Date.now() });
+    setMemories(mems);
+    stats.memoriesSaved++;
+    saveStats();
+    memInput.value = "";
+    renderMemories();
+    speak("Memory added.");
+  });
 
-      jarvisOrb?.addEventListener("click", () => {
-        unlockSpeech();
-        speak("Jarvis online. Awaiting your command.");
-      });
+  btnSaveWake?.addEventListener("click", () => {
+    const w = wakeInput?.value.trim().toLowerCase();
+    if (!w) return alert("Enter wake phrase");
+    customWake = w;
+    localStorage.setItem("jarvis_wake", w);
+    speak("Custom wake phrase saved as " + w);
+  });
 
-      btnCloseCamera?.addEventListener("click", closeCamera);
+  btnThemeToggle?.addEventListener("click", toggleTheme);
 
-      btnSwitchCamera?.addEventListener("click", async () => {
-        usingBackCam = !usingBackCam;
-        await openCamera();
-      });
+  btnVoiceTest?.addEventListener("click", () => {
+    unlockSpeech();
+    speak("Jarvis voice system is now online.");
+  });
 
-      btnCameraSnap?.addEventListener("click", () => {
-        if (!camStream || !camVideo) return;
-        const canvas = document.createElement("canvas");
-        canvas.width = camVideo.videoWidth;
-        canvas.height = camVideo.videoHeight;
-        canvas.getContext("2d").drawImage(camVideo, 0, 0, canvas.width, canvas.height);
-        const url = canvas.toDataURL("image/png");
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "cam-snap.png";
-        a.click();
-        log("Camera snapshot taken");
-        speak("Snapshot saved");
-      });
+  btnClearMemories?.addEventListener("click", () => {
+    if (!confirm("Delete all saved memories?")) return;
+    setMemories([]);
+    renderMemories();
+    speak("All memories cleared.");
+  });
 
-      unlockBtn?.addEventListener("click", unlockScreen);
+  jarvisOrb?.addEventListener("click", () => {
+    unlockSpeech();
+    speak("Jarvis online. Awaiting your command.");
+  });
 
-      btnFaceCapture?.addEventListener("click", async () => {
-        try {
-          if (!navigator.mediaDevices?.getUserMedia) throw new Error("Camera not supported");
-          const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-          const video = document.createElement("video");
-          video.style.display = "none";
-          video.srcObject = stream;
-          document.body.appendChild(video);
-          await video.play();
-          await new Promise(r => setTimeout(r, 500));
+  btnCloseCamera?.addEventListener("click", closeCamera);
 
-          const canvas = document.createElement("canvas");
-          canvas.width = video.videoWidth || 320;
-          canvas.height = video.videoHeight || 240;
-          canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+  btnSwitchCamera?.addEventListener("click", async () => {
+    usingBackCam = !usingBackCam;
+    await openCamera();
+  });
 
-          const data = canvas.toDataURL("image/png");
-          localStorage.setItem("jarvis_face", data);
-          faceDataUrl = data;
-          renderFacePreview(data);
-          if (faceStatus) faceStatus.textContent = "Face enrolled";
-          speak("Face captured and enrolled.");
+  btnCameraSnap?.addEventListener("click", () => {
+    if (!camStream || !camVideo) return;
+    const canvas = document.createElement("canvas");
+    canvas.width = camVideo.videoWidth;
+    canvas.height = camVideo.videoHeight;
+    canvas.getContext("2d").drawImage(camVideo, 0, 0, canvas.width, canvas.height);
+    const url = canvas.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "cam-snap.png";
+    a.click();
+    log("Camera snapshot taken");
+    speak("Snapshot saved");
+  });
 
-          stream.getTracks().forEach(t => t.stop());
-          video.remove();
-        } catch (e) {
-          alert("Face capture failed: " + e.message);
-          log("Face capture error: " + e.message, "err");
-        }
-      });
+  unlockBtn?.addEventListener("click", unlockScreen);
 
-      btnFaceLogin?.addEventListener("click", async () => {
-        if (!faceDataUrl) {
-          alert("No face enrolled. Capture first.");
-          return;
-        }
+  btnFaceCapture?.addEventListener("click", async () => {
+    try {
+      if (!navigator.mediaDevices?.getUserMedia) throw new Error("Camera not supported");
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      const video = document.createElement("video");
+      video.style.display = "none";
+      video.srcObject = stream;
+      document.body.appendChild(video);
+      await video.play();
+      await new Promise(r => setTimeout(r, 500));
 
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-          const video = document.createElement("video");
-          video.style.display = "none";
-          video.srcObject = stream;
-          document.body.appendChild(video);
-          await video.play();
-          await new Promise(r => setTimeout(r, 500));
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth || 320;
+      canvas.height = video.videoHeight || 240;
+      canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
 
-          const canvas = document.createElement("canvas");
-          canvas.width = video.videoWidth || 320;
-          canvas.height = video.videoHeight || 240;
-          canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
-          const current = canvas.toDataURL("image/png");
+      const data = canvas.toDataURL("image/png");
+      localStorage.setItem("jarvis_face", data);
+      faceDataUrl = data;
+      renderFacePreview(data);
+      if (faceStatus) faceStatus.textContent = "Face enrolled";
+      speak("Face captured and enrolled.");
 
-          stream.getTracks().forEach(t => t.stop());
-          video.remove();
+      stream.getTracks().forEach(t => t.stop());
+      video.remove();
+    } catch (e) {
+      alert("Face capture failed: " + e.message);
+      log("Face capture error: " + e.message, "err");
+    }
+  });
 
-          const diff = await computeImageDiff(faceDataUrl, current);
-          if (diff < 0.12) {
-            speak("Face matched. Welcome back.");
-            log("Face login successful");
-          } else {
-            speak("Face did not match.");
-            log("Face login failed", "err");
-            alert("Face did not match. Try enrolling again.");
-          }
-        } catch (e) {
-          alert("Face login failed: " + e.message);
-          log("Face login error: " + e.message, "err");
-        }
-      });
+  btnFaceLogin?.addEventListener("click", async () => {
+    if (!faceDataUrl) {
+      alert("No face enrolled. Capture first.");
+      return;
+    }
 
-      init();
-    })();
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      const video = document.createElement("video");
+      video.style.display = "none";
+      video.srcObject = stream;
+      document.body.appendChild(video);
+      await video.play();
+      await new Promise(r => setTimeout(r, 500));
+
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth || 320;
+      canvas.height = video.videoHeight || 240;
+      canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+      const current = canvas.toDataURL("image/png");
+
+      stream.getTracks().forEach(t => t.stop());
+      video.remove();
+
+      const diff = await computeImageDiff(faceDataUrl, current);
+      if (diff < 0.12) {
+        speak("Face matched. Welcome back.");
+        log("Face login successful");
+      } else {
+        speak("Face did not match.");
+        log("Face login failed", "err");
+        alert("Face did not match. Try enrolling again.");
+      }
+    } catch (e) {
+      alert("Face login failed: " + e.message);
+      log("Face login error: " + e.message, "err");
+    }
+  });
+
+  init();
+})();
   </script>
-</body>
-</html>
