@@ -495,6 +495,13 @@
   </style>
 </head>
 <body>
+  <div id="auth-box">
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+
+  <button onclick="signup()">Signup</button>
+  <button onclick="login()">Login</button>
+  </div>
   <div class="bg-grid"></div>
   <div class="hud-glow"></div>
   <div class="hud-glow2"></div>
@@ -2654,4 +2661,8 @@ if ("serviceWorker" in navigator) {
 
   init();
 })();
+    
   </script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
