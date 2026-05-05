@@ -495,13 +495,15 @@
   </style>
 </head>
 <body>
-  <div id="auth-box">
-  <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
+<div id="auth-box" style="position:fixed; top:20px; left:20px; z-index:999999; background:#050b14; color:white; padding:20px; border:2px solid cyan; border-radius:16px; box-shadow:0 0 30px cyan;">
+  <h2>Login</h2>
+
+  <input id="email" placeholder="Email" style="display:block; margin:10px 0; padding:10px; width:240px;">
+  <input id="password" type="password" placeholder="Password" style="display:block; margin:10px 0; padding:10px; width:240px;">
 
   <button onclick="signup()">Signup</button>
   <button onclick="login()">Login</button>
-  </div>
+</div>
   <div class="bg-grid"></div>
   <div class="hud-glow"></div>
   <div class="hud-glow2"></div>
